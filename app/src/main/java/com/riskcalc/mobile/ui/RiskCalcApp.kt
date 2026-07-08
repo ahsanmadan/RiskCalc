@@ -153,7 +153,9 @@ private fun RiskFormScreen(
 
         ResultCard(
             resultText = viewModel.resultText,
-            predictionClass = viewModel.predictionClass
+            predictionClass = viewModel.predictionClass,
+            explanation = viewModel.explanation,
+            recommendations = viewModel.recommendations
         )
     }
 }
@@ -161,7 +163,9 @@ private fun RiskFormScreen(
 @Composable
 private fun ResultCard(
     resultText: String,
-    predictionClass: Int?
+    predictionClass: Int?,
+    explanation: String?,
+    recommendations: List<String>
 ) {
     // Tentukan warna berdasarkan kelas prediksi
     val (containerColor, contentColor) = when (predictionClass) {
@@ -195,8 +199,44 @@ private fun ResultCard(
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = resultText,
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Bold
             )
+
+            if (!explanation.isNullOrBlank()) {
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = explanation,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+
+            if (recommendations.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "Rekomendasi & Tindakan Pencegahan:",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                recommendations.forEach { recommendation ->
+                    Row(
+                        modifier = Modifier.padding(vertical = 3.dp),
+                        verticalAlignment = Alignment.Top
+                    ) {
+                        Text(
+                            text = "• ",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = recommendation,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
+            }
         }
     }
 }
+
