@@ -50,6 +50,8 @@ class PredictResponse(BaseModel):
     prediction: int = Field(..., description="0 = Risiko Rendah, 1 = Risiko Tinggi")
     label: str = Field(..., description="Teks klasifikasi risiko ('Risiko Rendah' atau 'Risiko Tinggi')")
     confidence: float = Field(..., description="Nilai tingkat keyakinan (confidence score)")
+    explanation: str = Field(..., description="Penjelasan klinis mengenai tingkat risiko")
+    recommendations: list[str] = Field(..., description="Daftar rekomendasi solusi medis")
 
 @app.get("/health")
 def health_check():
@@ -87,14 +89,37 @@ def predict(request: PredictRequest):
         # Format label hasil prediksi
         label = "Risiko Tinggi" if prediction == 1 else "Risiko Rendah"
         
+        # Penjelasan klinis & rekomendasi penanggulangan dinamis
+        if prediction == 1:
+            explanation = "Berdasarkan analisis model Perceptron, Anda memiliki faktor risiko tinggi terhadap penyakit kardiovaskular. Hal ini dipengaruhi oleh kombinasi variabel klinis seperti usia, tekanan darah sistolik, kadar kolesterol total, dan status merokok Anda."
+            recommendations = [
+                "Segera lakukan konsultasi dengan dokter spesialis jantung atau dokter umum.",
+                "Kurangi konsumsi makanan asin (natrium tinggi), makanan berlemak jenuh, dan makanan olahan.",
+                "Berhenti merokok sepenuhnya dan hindari paparan asap rokok pasif di lingkungan Anda.",
+                "Lakukan olahraga kardio intensitas ringan-sedang (seperti jalan cepat) minimal 30 menit sehari.",
+                "Lakukan pemantauan mandiri terhadap tekanan darah dan cek profil lipid (kolesterol) secara rutin."
+            ]
+        else:
+            explanation = "Berdasarkan analisis model Perceptron, Anda tergolong memiliki faktor risiko rendah terhadap penyakit kardiovaskular saat ini. Namun, mempertahankan pola hidup sehat sangat disarankan untuk pencegahan jangka panjang."
+            recommendations = [
+                "Pertahankan pola makan tinggi serat dengan memperbanyak konsumsi sayur, buah, dan biji-bijian.",
+                "Lakukan aktivitas fisik secara teratur minimal 150 menit per minggu.",
+                "Hindari memulai kebiasaan merokok dan konsumsi minuman beralkohol.",
+                "Lakukan pemeriksaan kesehatan berkala (medical check-up) minimal satu tahun sekali.",
+                "Kelola stres dengan baik dan pastikan mendapatkan istirahat yang cukup (7-8 jam per hari)."
+            ]
+        
         return PredictResponse(
             prediction=prediction,
             label=label,
-            confidence=round(float(prob), 4)
+            confidence=round(float(prob), 4),
+            explanation=explanation,
+            recommendations=recommendations
         )
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Terjadi kesalahan saat memproses prediksi: {str(e)}")
+
 
 if __name__ == "__main__":
     import uvicorn

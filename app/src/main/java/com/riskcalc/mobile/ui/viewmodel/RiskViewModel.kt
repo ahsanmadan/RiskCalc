@@ -39,6 +39,12 @@ class RiskViewModel(
     var confidence by mutableStateOf<Double?>(null)
         private set
 
+    var explanation by mutableStateOf<String?>(null)
+        private set
+
+    var recommendations by mutableStateOf<List<String>>(emptyList())
+        private set
+
     // Setter functions untuk Form Input
     fun onAgeChange(value: String) {
         // Hanya izinkan angka
@@ -75,6 +81,8 @@ class RiskViewModel(
             resultText = "Harap isi semua kolom input dengan angka yang valid!"
             predictionClass = null
             confidence = null
+            explanation = null
+            recommendations = emptyList()
             return
         }
 
@@ -83,6 +91,8 @@ class RiskViewModel(
         resultText = "Sedang menghubungi server..."
         predictionClass = null
         confidence = null
+        explanation = null
+        recommendations = emptyList()
 
         // 3. Jalankan Coroutine di latar belakang
         viewModelScope.launch {
@@ -98,20 +108,27 @@ class RiskViewModel(
                 // 4. Sukses: Update state dengan hasil prediksi
                 predictionClass = response.prediction
                 confidence = response.confidence
+                explanation = response.explanation
+                recommendations = response.recommendations
                 resultText = "Pasien diklasifikasikan dengan ${response.label} (Tingkat keyakinan: ${(response.confidence * 100).toInt()}%)"
             } catch (e: IOException) {
                 // Error koneksi internet/server mati
                 resultText = "Koneksi ke API gagal. Pastikan server FastAPI sudah berjalan dan jalankan perintah 'adb reverse tcp:8000 tcp:8000' lewat kabel USB."
                 predictionClass = null
                 confidence = null
+                explanation = null
+                recommendations = emptyList()
             } catch (e: Exception) {
                 // Error lainnya (HTTP error, parsing error)
                 resultText = "Terjadi kesalahan sistem: ${e.localizedMessage ?: "Unknown Error"}"
                 predictionClass = null
                 confidence = null
+                explanation = null
+                recommendations = emptyList()
             } finally {
                 isLoading = false
             }
         }
     }
+
 }
