@@ -87,8 +87,32 @@ export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" #
 
 ---
 
+### Metode C: Menjalankan Backend FastAPI & Sinkronisasi HP
+
+Aplikasi ini memerlukan backend aktif untuk memproses data.
+
+1. **Jalankan Backend FastAPI**:
+   Buka terminal baru, masuk ke folder backend, aktifkan virtual environment, dan jalankan server:
+   ```powershell
+   cd backend
+   .\.venv\Scripts\Activate.ps1
+   # Latih model sekali jika file model.pkl belum ada
+   python ml/train.py
+   # Jalankan server
+   uvicorn main:app --reload
+   ```
+
+2. **Hubungkan Port Localhost ke HP Fisik (ADB Reverse)**:
+   Buka terminal terpisah (selain terminal server uvicorn), lalu jalankan perintah berikut untuk mengarahkan request port `8000` dari HP ke laptop:
+   ```powershell
+   & "C:\Users\M S I\AppData\Local\Android\Sdk\platform-tools\adb.exe" reverse tcp:8000 tcp:8000
+   ```
+
+---
+
 ## Roadmap Pengembangan Berikutnya
 
-1. **Komponen UI**: Memisahkan form input ke komponen modular (`RiskInputField`, `RiskResultCard`).
-2. **ViewModel**: Menerapkan arsitektur MVVM dengan `RiskViewModel` untuk mengelola state form dan data.
-3. **API Integration**: Menambahkan library **Retrofit** untuk mengirim data input pasien ke backend FastAPI dan model prediksi Perceptron.
+- [x] **Integrasi API & Machine Learning**: Menghubungkan client Android native dengan API FastAPI menggunakan library Retrofit.
+- [x] **ViewModel & Arsitektur MVVM**: Menerapkan arsitektur bersih Jetpack dengan `RiskViewModel` untuk mengelola state data input dan respons prediksi.
+- [ ] **Pemisahan Komponen UI (Refactoring)**: Memisahkan form input menjadi file komponen modular yang terpisah (`RiskInputField.kt`, `RiskResultCard.kt`).
+- [ ] **Validasi Input**: Menambahkan validasi data masukan pengguna di sisi Android sebelum data dikirim ke API (misalnya: usia tidak boleh kosong, dsb).
