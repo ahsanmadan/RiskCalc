@@ -27,7 +27,8 @@
 .DS_Store
 Thumbs.db
 
-# Ignored learning notes/explanations
+# Catatan lokal (tidak perlu di-share ke tim)
+/docs/project_critique.md
 /docs/explanation/
 
 # Python Virtual Environment & Cache
@@ -38,3 +39,6 @@ __pycache__/
 
 # Local progress log
 /PROGRESS.md
+
+# ML artifacts — dihasilkan otomatis oleh train.py, jangan commit jika pakai data pasien nyata
+# backend/ml/artifacts/*.pkl
