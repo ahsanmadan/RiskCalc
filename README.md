@@ -87,8 +87,116 @@ export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" #
 
 ---
 
-## Roadmap Pengembangan Berikutnya
+### Metode B: Menjalankan Lewat Android Studio UI
 
-1. **Komponen UI**: Memisahkan form input ke komponen modular (`RiskInputField`, `RiskResultCard`).
-2. **ViewModel**: Menerapkan arsitektur MVVM dengan `RiskViewModel` untuk mengelola state form dan data.
-3. **API Integration**: Menambahkan library **Retrofit** untuk mengirim data input pasien ke backend FastAPI dan model prediksi Perceptron.
+1. Buka folder `RiskCalc` ini menggunakan **Android Studio**.
+2. Tunggu proses *Gradle Sync* selesai (status loading di pojok kanan bawah selesai).
+3. Lihat ke toolbar atas Android Studio, pastikan nama HP Samsung/Android-mu sudah terdeteksi di dropdown device.
+4. Klik tombol **Run** (ikon segitiga hijau ▶️) atau tekan shortcut `Shift + F10`.
+
+---
+
+## 🗺️ Peta Arsitektur Sistem
+
+Berikut adalah diagram alir proses data dari form aplikasi mobile hingga diklasifikasikan oleh engine Machine Learning di backend:
+
+```mermaid
+flowchart TD
+    subgraph Client [Android Mobile App - Kotlin]
+        UI["RiskCalcApp (Compose UI)"]
+        VM["RiskViewModel (State Management)"]
+        Repo["RiskRepository (Data Access)"]
+        ClientAPI["ApiClient (Retrofit HTTP Client)"]
+    end
+
+    subgraph Backend [FastAPI Backend - Python]
+        API["main.py (FastAPI Server)"]
+        Scaler["StandardScaler (Feature Scaling)"]
+        Model["Perceptron Classifier (ML Model)"]
+    end
+
+    UI <-->|Mengirim Event & Mengamati State| VM
+    VM <-->|Coroutine Async Call| Repo
+    Repo <-->|Request/Response DTO| ClientAPI
+    ClientAPI <-->|HTTP POST /predict| API
+    API <-->|Fitur Mentah -> Terstandarisasi| Scaler
+    Scaler <-->|Fitur Terstandarisasi| Model
+```
+
+---
+
+## ⚡ Cheatsheet Perintah Cepat
+
+Daftar perintah praktis untuk menjalankan seluruh ekosistem aplikasi di terminal Windows (PowerShell):
+
+### 1. Menjalankan FastAPI & ML Model
+```powershell
+# Masuk ke direktori backend
+cd backend
+
+# Aktifkan virtual environment
+.\.venv\Scripts\Activate.ps1
+
+# Latih model untuk menghasilkan file artifacts (.pkl)
+python ml/train.py
+
+# Jalankan server API backend
+uvicorn main:app --reload
+```
+
+### 2. Forwarding Port PC ke HP Fisik (ADB Reverse)
+*Agar aplikasi di HP fisik bisa menembak `localhost:8000` di laptop:*
+```powershell
+& "C:\Users\M S I\AppData\Local\Android\Sdk\platform-tools\adb.exe" reverse tcp:8000 tcp:8000
+```
+
+### 3. Build & Install Aplikasi Android ke HP
+```powershell
+# Set path JDK bawaan Android Studio
+$env:JAVA_HOME="C:\Program Files\Android\Android Studio\jbr"
+
+# Build dan pasang langsung ke HP yang terhubung via USB
+.\gradlew.bat installDebug
+```
+
+---
+
+## 🛠️ Panduan Troubleshooting (Masalah Umum)
+
+Berikut beberapa error yang sering dijumpai beserta cara mengatasinya:
+
+### 1. Error: `adb : The term 'adb' is not recognized...`
+* **Masalah**: Windows tidak tahu di mana program `adb.exe` berada karena belum didaftarkan di environment PATH.
+* **Solusi**: Panggil menggunakan path lengkap (absolute path) milik Android Studio:
+  ```powershell
+  & "C:\Users\M S I\AppData\Local\Android\Sdk\platform-tools\adb.exe" <perintah_adb>
+  ```
+  Atau tambahkan `C:\Users\M S I\AppData\Local\Android\Sdk\platform-tools` ke System Path Windows.
+
+### 2. Error: HP Samsung Tidak Bisa Menginstal App / Tertolak ADB
+* **Masalah**: Fitur keamanan *Auto Blocker* bawaan Samsung One UI memblokir laptop untuk mengirim file APK secara paksa.
+* **Solusi**: Masuk ke **Pengaturan HP -> Keamanan dan privasi -> Pemblokir Otomatis (Auto Blocker)**, kemudian geser tombol ke posisi **Nonaktif (OFF)**.
+
+### 3. Error: `To use the fastapi command, please install fastapi[standard]`
+* **Masalah**: Perintah `fastapi dev` memerlukan paket opsional standard yang belum terinstal di virtual environment.
+* **Solusi**: Jangan gunakan perintah `fastapi dev`, melainkan jalankan FastAPI secara langsung melalui Uvicorn (yang sudah terinstal):
+  ```powershell
+  uvicorn main:app --reload
+  ```
+
+### 4. Masalah: HP Fisik Tidak Bisa Terhubung ke Server Backend (Connection Timeout)
+* **Masalah**: HP fisik menggunakan localhost (`127.0.0.1` atau `10.0.2.2`) tetapi tidak diarahkan ke server port lokal PC/laptop.
+* **Solusi**: Pastikan HP terhubung via kabel data, lalu jalankan perintah **ADB Reverse**:
+  ```powershell
+  & "C:\Users\M S I\AppData\Local\Android\Sdk\platform-tools\adb.exe" reverse tcp:8000 tcp:8000
+  ```
+
+---
+
+## 📋 Roadmap Pengembangan Berikutnya
+
+- [x] **Integrasi API & Machine Learning**: Menghubungkan client Android native dengan API FastAPI menggunakan library Retrofit.
+- [x] **ViewModel & Arsitektur MVVM**: Menerapkan arsitektur bersih Jetpack dengan `RiskViewModel` untuk mengelola state data input dan respons prediksi.
+- [ ] **Pemisahan Komponen UI (Refactoring)**: Memisahkan form input menjadi file komponen modular yang terpisah (`RiskInputField.kt`, `RiskResultCard.kt`).
+- [ ] **Validasi Input**: Menambahkan validasi data masukan pengguna di sisi Android sebelum data dikirim ke API (misalnya: usia tidak boleh kosong, dsb).
+
