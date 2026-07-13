@@ -61,6 +61,12 @@ def load_dataset(path: Path = DATASET_PATH) -> tuple[np.ndarray, np.ndarray, lis
     return features, labels, rows
 
 
+def canonical_dataset_sha256(path: Path = DATASET_PATH) -> str:
+    """Hash CSV text consistently across Git checkouts with LF or CRLF."""
+    canonical_bytes = path.read_bytes().replace(b"\r\n", b"\n")
+    return hashlib.sha256(canonical_bytes).hexdigest()
+
+
 def calculate_metrics(expected: np.ndarray, predicted: np.ndarray) -> dict:
     tn, fp, fn, tp = confusion_matrix(expected, predicted, labels=[0, 1]).ravel()
     return {
@@ -118,7 +124,7 @@ def train(dataset_path: Path = DATASET_PATH) -> TrainingOutput:
 
     validation_margins = np.abs(model.decision_function(validation_scaled))
     borderline_margin = float(np.percentile(validation_margins, 10))
-    dataset_sha = hashlib.sha256(dataset_path.read_bytes()).hexdigest()
+    dataset_sha = canonical_dataset_sha256(dataset_path)
 
     artifact = {
         "schemaVersion": 1,

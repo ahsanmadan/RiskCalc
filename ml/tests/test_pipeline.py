@@ -2,7 +2,7 @@ from pathlib import Path
 
 import numpy as np
 
-from ml.train_export import FEATURE_ORDER, load_dataset, train
+from ml.train_export import FEATURE_ORDER, canonical_dataset_sha256, load_dataset, train
 
 
 def test_dataset_schema_ranges_and_labels() -> None:
@@ -39,3 +39,12 @@ def test_repository_dataset_is_outside_android_assets() -> None:
     root = Path(__file__).resolve().parents[2]
     assert (root / "ml" / "data" / "dataset.csv").exists()
     assert not (root / "app" / "src" / "main" / "assets" / "dataset.csv").exists()
+
+
+def test_dataset_checksum_is_independent_of_checkout_line_endings(tmp_path: Path) -> None:
+    lf_dataset = tmp_path / "lf.csv"
+    crlf_dataset = tmp_path / "crlf.csv"
+    lf_dataset.write_bytes(b"age,risk_label\n32,0\n")
+    crlf_dataset.write_bytes(b"age,risk_label\r\n32,0\r\n")
+
+    assert canonical_dataset_sha256(lf_dataset) == canonical_dataset_sha256(crlf_dataset)

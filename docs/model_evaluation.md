@@ -6,7 +6,7 @@
 - Jumlah data: 4159
 - Model: Perceptron dengan StandardScaler
 - Split deterministik: 2911 train / 624 validation / 624 test
-- SHA-256 dataset: `99ff9e7c23ebbaecee90b9d7f3e6745609d01f1c8e0493132b89e85d73ea109f`
+- SHA-256 dataset: `5ec346b79f47a8eef6687d473c1cc3273b564788a285dc907171562cbc9a722e`
 
 ## Metrik Test
 
