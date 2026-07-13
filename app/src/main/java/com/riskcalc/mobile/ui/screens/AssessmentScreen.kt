@@ -57,8 +57,8 @@ import androidx.compose.ui.unit.dp
 import com.riskcalc.mobile.R
 import com.riskcalc.mobile.ui.components.ResponsiveContent
 import com.riskcalc.mobile.ui.components.RiskBackground
-import com.riskcalc.mobile.ui.components.AnimatedCareCharacter
 import com.riskcalc.mobile.ui.components.CareCharacterMood
+import com.riskcalc.mobile.ui.components.GeneratedRiskyCharacter
 import com.riskcalc.mobile.ui.viewmodel.AssessmentStep
 import com.riskcalc.mobile.ui.viewmodel.RiskUiState
 
@@ -132,7 +132,7 @@ fun AssessmentScreen(
                                 transitionSpec = { fadeIn() togetherWith fadeOut() },
                                 label = "step character"
                             ) { step ->
-                                AnimatedCareCharacter(
+                                GeneratedRiskyCharacter(
                                     mood = when (step) {
                                         AssessmentStep.Age -> CareCharacterMood.Cheerful
                                         AssessmentStep.Smoking -> CareCharacterMood.Thinking

@@ -39,10 +39,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.riskcalc.mobile.R
-import com.riskcalc.mobile.ui.components.AnimatedCareCharacter
 import com.riskcalc.mobile.ui.components.AnimatedEcgGraphic
 import com.riskcalc.mobile.ui.components.CareCharacterMood
 import com.riskcalc.mobile.ui.components.DisclaimerCard
+import com.riskcalc.mobile.ui.components.GeneratedRiskyCharacter
 import com.riskcalc.mobile.ui.components.ResponsiveContent
 import com.riskcalc.mobile.ui.components.RiskBackground
 
@@ -122,7 +122,7 @@ fun IntroScreen(
                                         modifier = Modifier.fillMaxWidth(),
                                         contentAlignment = Alignment.Center
                                     ) {
-                                        AnimatedCareCharacter(
+                                        GeneratedRiskyCharacter(
                                             mood = CareCharacterMood.Cheerful,
                                             description = stringResource(R.string.happy_character_description),
                                             modifier = Modifier.size(190.dp)

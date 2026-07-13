@@ -9,6 +9,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Arrangement
@@ -35,11 +36,14 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.riskcalc.mobile.R
 
 enum class HeartMood { Happy, Calm }
 enum class CareCharacterMood { Cheerful, Thinking, Reassuring }
@@ -307,6 +311,82 @@ fun AnimatedCareCharacter(
                 topLeft = Offset(width * 0.41f, height * 0.49f),
                 size = Size(width * 0.18f, height * 0.11f),
                 style = Stroke(width * 0.026f, cap = StrokeCap.Round)
+            )
+        }
+    }
+}
+
+@Composable
+fun GeneratedRiskyCharacter(
+    mood: CareCharacterMood,
+    description: String,
+    modifier: Modifier = Modifier
+) {
+    val animation = rememberInfiniteTransition(label = "generated Risky character")
+    val floatOffset by animation.animateFloat(
+        initialValue = 3f,
+        targetValue = -7f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1700, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "Risky float"
+    )
+    val breathScale by animation.animateFloat(
+        initialValue = 0.985f,
+        targetValue = 1.018f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1450, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "Risky breath"
+    )
+    val sparkleAlpha by animation.animateFloat(
+        initialValue = 0.18f,
+        targetValue = 0.90f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(900, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "Risky sparkle"
+    )
+    val density = LocalDensity.current
+    val artwork = when (mood) {
+        CareCharacterMood.Cheerful -> R.drawable.risky_cheerful
+        CareCharacterMood.Thinking -> R.drawable.risky_thinking
+        CareCharacterMood.Reassuring -> R.drawable.risky_reassuring
+    }
+    val sparkleColor = MaterialTheme.colorScheme.tertiary
+
+    Box(
+        modifier = modifier.graphicsLayer {
+            translationY = with(density) { floatOffset.dp.toPx() }
+            scaleX = breathScale
+            scaleY = breathScale
+        },
+        contentAlignment = Alignment.Center
+    ) {
+        Image(
+            painter = painterResource(artwork),
+            contentDescription = description,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Fit
+        )
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            drawCircle(
+                color = sparkleColor.copy(alpha = sparkleAlpha),
+                radius = size.minDimension * 0.018f,
+                center = Offset(size.width * 0.13f, size.height * 0.24f)
+            )
+            drawCircle(
+                color = sparkleColor.copy(alpha = sparkleAlpha * 0.72f),
+                radius = size.minDimension * 0.012f,
+                center = Offset(size.width * 0.88f, size.height * 0.34f)
+            )
+            drawCircle(
+                color = sparkleColor.copy(alpha = sparkleAlpha * 0.55f),
+                radius = size.minDimension * 0.008f,
+                center = Offset(size.width * 0.82f, size.height * 0.17f)
             )
         }
     }

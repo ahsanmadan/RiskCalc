@@ -42,9 +42,9 @@ import com.riskcalc.mobile.domain.model.FactorSummary
 import com.riskcalc.mobile.domain.model.FactorTone
 import com.riskcalc.mobile.domain.model.RiskResult
 import com.riskcalc.mobile.ui.components.DisclaimerCard
-import com.riskcalc.mobile.ui.components.AnimatedCareCharacter
 import com.riskcalc.mobile.ui.components.AnimatedEcgGraphic
 import com.riskcalc.mobile.ui.components.CareCharacterMood
+import com.riskcalc.mobile.ui.components.GeneratedRiskyCharacter
 import com.riskcalc.mobile.ui.components.ResponsiveContent
 import com.riskcalc.mobile.ui.components.RiskBackground
 
@@ -250,7 +250,7 @@ private fun ResultHero(result: RiskResult) {
             modifier = Modifier.padding(22.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            AnimatedCareCharacter(
+            GeneratedRiskyCharacter(
                 mood = if (isHigh) {
                     CareCharacterMood.Reassuring
                 } else {
