@@ -1,9 +1,11 @@
 package com.riskcalc.mobile.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,8 +21,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+
+enum class HeartMood { Happy, Calm }
 
 @Composable
 fun RiskBackground(
@@ -33,14 +42,25 @@ fun RiskBackground(
             .background(
                 Brush.verticalGradient(
                     colors = listOf(
+                        MaterialTheme.colorScheme.background,
                         MaterialTheme.colorScheme.surface,
-                        MaterialTheme.colorScheme.surface,
-                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.10f)
+                        MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.18f)
                     )
                 )
             ),
-        content = content
-    )
+    ) {
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(top = 36.dp)
+                .size(150.dp)
+                .background(
+                    MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.32f),
+                    RoundedCornerShape(bottomStart = 100.dp, topStart = 100.dp)
+                )
+        )
+        content()
+    }
 }
 
 @Composable
@@ -93,6 +113,56 @@ fun DisclaimerCard(
                 modifier = Modifier.weight(1f),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium
+            )
+        }
+    }
+}
+
+@Composable
+fun HeartCompanion(
+    mood: HeartMood,
+    description: String,
+    modifier: Modifier = Modifier
+) {
+    val heartColor = MaterialTheme.colorScheme.primary
+    val faceColor = MaterialTheme.colorScheme.onPrimary
+    Canvas(
+        modifier = modifier.semantics {
+            contentDescription = description
+        }
+    ) {
+        val width = size.width
+        val height = size.height
+        val heart = Path().apply {
+            moveTo(width * 0.50f, height * 0.90f)
+            cubicTo(width * 0.40f, height * 0.80f, width * 0.10f, height * 0.61f, width * 0.10f, height * 0.34f)
+            cubicTo(width * 0.10f, height * 0.14f, width * 0.27f, height * 0.06f, width * 0.42f, height * 0.14f)
+            cubicTo(width * 0.47f, height * 0.17f, width * 0.50f, height * 0.23f, width * 0.50f, height * 0.23f)
+            cubicTo(width * 0.50f, height * 0.23f, width * 0.53f, height * 0.17f, width * 0.58f, height * 0.14f)
+            cubicTo(width * 0.73f, height * 0.06f, width * 0.90f, height * 0.14f, width * 0.90f, height * 0.34f)
+            cubicTo(width * 0.90f, height * 0.61f, width * 0.60f, height * 0.80f, width * 0.50f, height * 0.90f)
+            close()
+        }
+        drawPath(heart, color = heartColor)
+        drawCircle(faceColor, radius = width * 0.035f, center = androidx.compose.ui.geometry.Offset(width * 0.40f, height * 0.38f))
+        drawCircle(faceColor, radius = width * 0.035f, center = androidx.compose.ui.geometry.Offset(width * 0.60f, height * 0.38f))
+        if (mood == HeartMood.Happy) {
+            drawArc(
+                color = faceColor,
+                startAngle = 18f,
+                sweepAngle = 144f,
+                useCenter = false,
+                topLeft = androidx.compose.ui.geometry.Offset(width * 0.37f, height * 0.43f),
+                size = androidx.compose.ui.geometry.Size(width * 0.26f, height * 0.18f),
+                style = Stroke(width = width * 0.035f, cap = StrokeCap.Round)
+            )
+        } else {
+            drawLine(
+                color = faceColor,
+                start = androidx.compose.ui.geometry.Offset(width * 0.42f, height * 0.53f),
+                end = androidx.compose.ui.geometry.Offset(width * 0.58f, height * 0.53f),
+                strokeWidth = width * 0.035f,
+                cap = StrokeCap.Round
             )
         }
     }

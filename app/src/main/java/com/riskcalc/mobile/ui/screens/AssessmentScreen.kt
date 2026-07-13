@@ -6,9 +6,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -36,6 +38,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
@@ -46,6 +49,8 @@ import androidx.compose.ui.unit.dp
 import com.riskcalc.mobile.R
 import com.riskcalc.mobile.ui.components.ResponsiveContent
 import com.riskcalc.mobile.ui.components.RiskBackground
+import com.riskcalc.mobile.ui.components.HeartCompanion
+import com.riskcalc.mobile.ui.components.HeartMood
 import com.riskcalc.mobile.ui.viewmodel.AssessmentStep
 import com.riskcalc.mobile.ui.viewmodel.RiskUiState
 
@@ -98,38 +103,55 @@ fun AssessmentScreen(
                         .imePadding()
                         .padding(top = 20.dp, bottom = 28.dp)
                 ) {
-                    Row(
+                    Surface(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        shape = RoundedCornerShape(24.dp),
+                        color = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
                     ) {
-                        Text(
-                            text = stringResource(R.string.app_name),
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        Text(
-                            text = stringResource(R.string.step_progress, state.currentStep.number),
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                        Row(
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(14.dp)
+                        ) {
+                            HeartCompanion(
+                                mood = HeartMood.Happy,
+                                description = stringResource(R.string.happy_heart_description),
+                                modifier = Modifier.size(62.dp)
+                            )
+                            Column(
+                                modifier = Modifier.weight(1f),
+                                verticalArrangement = Arrangement.spacedBy(3.dp)
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.step_progress, state.currentStep.number),
+                                    style = MaterialTheme.typography.titleMedium
+                                )
+                                Text(
+                                    text = stringResource(R.string.step_support),
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
+                        }
                     }
                     LinearProgressIndicator(
                         progress = { state.currentStep.number / 4f },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 12.dp)
-                            .height(6.dp),
+                            .padding(top = 14.dp)
+                            .height(8.dp),
                         trackColor = MaterialTheme.colorScheme.surfaceContainerHighest
                     )
 
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 30.dp),
-                        shape = RoundedCornerShape(26.dp),
+                            .padding(top = 22.dp),
+                        shape = RoundedCornerShape(30.dp),
                         colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainerLow
-                        )
+                            containerColor = MaterialTheme.colorScheme.surface
+                        ),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                     ) {
                         Column(modifier = Modifier.padding(22.dp)) {
                             QuestionContent(
@@ -225,7 +247,7 @@ private fun AssessmentActions(
     isLastStep: Boolean
 ) {
     Surface(
-        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.96f),
+        color = MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.98f),
         tonalElevation = 3.dp
     ) {
         Row(
@@ -239,7 +261,7 @@ private fun AssessmentActions(
                 onClick = onBack,
                 modifier = Modifier
                     .weight(1f)
-                    .height(54.dp),
+                    .heightIn(min = 54.dp),
                 shape = RoundedCornerShape(17.dp)
             ) {
                 Text(stringResource(R.string.back))
@@ -248,7 +270,7 @@ private fun AssessmentActions(
                 onClick = onContinue,
                 modifier = Modifier
                     .weight(1.45f)
-                    .height(54.dp),
+                    .heightIn(min = 54.dp),
                 shape = RoundedCornerShape(17.dp)
             ) {
                 Text(stringResource(if (isLastStep) R.string.see_result else R.string.next))

@@ -5,9 +5,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -31,6 +33,8 @@ import com.riskcalc.mobile.domain.model.FactorSummary
 import com.riskcalc.mobile.domain.model.FactorTone
 import com.riskcalc.mobile.domain.model.RiskResult
 import com.riskcalc.mobile.ui.components.DisclaimerCard
+import com.riskcalc.mobile.ui.components.HeartCompanion
+import com.riskcalc.mobile.ui.components.HeartMood
 import com.riskcalc.mobile.ui.components.ResponsiveContent
 import com.riskcalc.mobile.ui.components.RiskBackground
 
@@ -71,6 +75,11 @@ fun ResultScreen(
                     text = stringResource(R.string.result_title),
                     style = MaterialTheme.typography.headlineLarge,
                     color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = stringResource(R.string.result_thanks),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 ResultHero(result = result)
                 if (result.severeBloodPressureWarning) {
@@ -167,7 +176,7 @@ fun ResultScreen(
                         onClick = onEdit,
                         modifier = Modifier
                             .weight(1f)
-                            .height(54.dp),
+                            .heightIn(min = 54.dp),
                         shape = RoundedCornerShape(17.dp)
                     ) {
                         Text(stringResource(R.string.edit_data))
@@ -176,7 +185,7 @@ fun ResultScreen(
                         onClick = onNewAssessment,
                         modifier = Modifier
                             .weight(1f)
-                            .height(54.dp),
+                            .heightIn(min = 54.dp),
                         shape = RoundedCornerShape(17.dp)
                     ) {
                         Text(stringResource(R.string.new_assessment))
@@ -202,23 +211,32 @@ private fun ResultHero(result: RiskResult) {
     val isHigh = result.prediction.classId == 1
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(28.dp),
+        shape = RoundedCornerShape(32.dp),
         colors = CardDefaults.cardColors(
             containerColor = if (isHigh) {
-                MaterialTheme.colorScheme.secondaryContainer
-            } else {
                 MaterialTheme.colorScheme.primaryContainer
+            } else {
+                MaterialTheme.colorScheme.secondaryContainer
             },
             contentColor = if (isHigh) {
-                MaterialTheme.colorScheme.onSecondaryContainer
-            } else {
                 MaterialTheme.colorScheme.onPrimaryContainer
+            } else {
+                MaterialTheme.colorScheme.onSecondaryContainer
             }
         )
     ) {
-        Column(modifier = Modifier.padding(22.dp)) {
+        Column(
+            modifier = Modifier.padding(22.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            HeartCompanion(
+                mood = if (isHigh) HeartMood.Calm else HeartMood.Happy,
+                description = stringResource(R.string.calm_heart_description),
+                modifier = Modifier.size(132.dp)
+            )
             Text(
                 text = stringResource(R.string.result_context),
+                modifier = Modifier.padding(top = 6.dp),
                 style = MaterialTheme.typography.labelLarge
             )
             Text(

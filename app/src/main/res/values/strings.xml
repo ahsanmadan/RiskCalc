@@ -1,20 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">RiskCalc</string>
-    <string name="app_tagline">Simulasi Skrining Risiko Jantung</string>
+    <string name="app_tagline">Teman skrining risiko jantung Anda</string>
     <string name="educational_label">SIMULASI EDUKATIF</string>
-    <string name="intro_title">Kenali faktor risiko, mulai dari empat data sederhana.</string>
-    <string name="intro_body">RiskCalc membantu melihat pola faktor risiko dari usia, kebiasaan merokok, tekanan darah sistolik, dan kolesterol total.</string>
-    <string name="intro_data_title">Siapkan data berikut</string>
+    <string name="care_eyebrow">HAI, KAMI SIAP MENEMANI</string>
+    <string name="intro_title">Kenali kesehatan jantungmu, tanpa menghakimi.</string>
+    <string name="intro_body">Jawab empat pertanyaan sederhana. Kami akan membantu menjelaskan hasilnya dengan bahasa yang tenang dan mudah dipahami.</string>
+    <string name="assessment_duration">4 langkah · sekitar 2 menit</string>
+    <string name="happy_heart_description">Ilustrasi jantung tersenyum yang menemani pemeriksaan</string>
+    <string name="calm_heart_description">Ilustrasi jantung tenang yang menemani penjelasan hasil</string>
+    <string name="intro_data_title">Yang perlu Anda siapkan</string>
     <string name="intro_data_list">Usia  |  Status merokok  |  Sistolik  |  Kolesterol</string>
     <string name="smoking_label_short">Status merokok</string>
     <string name="disclaimer">Hasil ini hanya simulasi skrining awal untuk pembelajaran, bukan diagnosis medis atau pengganti pemeriksaan tenaga kesehatan.</string>
-    <string name="start_assessment">Mulai periksa</string>
+    <string name="start_assessment">Mulai dengan tenang</string>
     <string name="offline_private">Berjalan offline. Data tidak disimpan.</string>
     <string name="back">Kembali</string>
     <string name="next">Lanjut</string>
     <string name="see_result">Lihat hasil</string>
     <string name="step_progress">Langkah %1$d dari 4</string>
+    <string name="step_support">Pelan-pelan saja. Isi sesuai data yang Anda ketahui.</string>
     <string name="age_question">Berapa usia Anda?</string>
     <string name="age_helper">Masukkan usia dalam tahun. Model mendukung usia 32&#8211;70 tahun.</string>
     <string name="age_label">Usia</string>
@@ -38,6 +43,7 @@
     <string name="cholesterol_help_body">Nilai kolesterol total tercantum pada hasil pemeriksaan profil lipid dalam mg/dL. Gunakan nilai dari hasil pemeriksaan laboratorium, jangan menebak.</string>
     <string name="close">Tutup</string>
     <string name="result_title">Hasil simulasi</string>
+    <string name="result_thanks">Terima kasih sudah meluangkan waktu untuk diri Anda.</string>
     <string name="result_context">Berdasarkan empat data yang Anda masukkan</string>
     <string name="high_result_support">Kombinasi faktor Anda berada di sisi risiko lebih tinggi pada model pembelajaran ini.</string>
     <string name="low_result_support">Kombinasi faktor Anda berada di sisi risiko lebih rendah pada model pembelajaran ini, bukan berarti tanpa risiko.</string>

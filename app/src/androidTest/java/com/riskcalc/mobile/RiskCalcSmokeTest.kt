@@ -18,7 +18,7 @@ class RiskCalcSmokeTest {
     @Test
     fun cold_start_shows_intro_and_disclaimer() {
         composeRule.onNodeWithText("RiskCalc").assertIsDisplayed()
-        composeRule.onNodeWithText("Mulai periksa").assertIsDisplayed()
+        composeRule.onNodeWithText("Mulai dengan tenang").assertIsDisplayed()
         composeRule.onNodeWithText(
             "Hasil ini hanya simulasi skrining awal untuk pembelajaran, bukan diagnosis medis atau pengganti pemeriksaan tenaga kesehatan."
         ).assertIsDisplayed()
@@ -26,7 +26,7 @@ class RiskCalcSmokeTest {
 
     @Test
     fun severe_systolic_warning_appears_before_result() {
-        composeRule.onNodeWithText("Mulai periksa").performClick()
+        composeRule.onNodeWithText("Mulai dengan tenang").performClick()
         enterCurrentNumber("60")
         composeRule.onNodeWithText("Lanjut").performClick()
         composeRule.onNodeWithText("Ya, saya merokok").performClick()

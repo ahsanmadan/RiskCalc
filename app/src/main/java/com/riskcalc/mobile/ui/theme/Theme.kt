@@ -11,51 +11,51 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
 private val LightColors = lightColorScheme(
-    primary = TealPrimary,
-    onPrimary = OnTealPrimary,
-    primaryContainer = TealPrimaryContainer,
-    onPrimaryContainer = OnTealPrimaryContainer,
-    secondary = OliveSecondary,
-    onSecondary = OnOliveSecondary,
-    secondaryContainer = OliveSecondaryContainer,
-    onSecondaryContainer = OnOliveSecondaryContainer,
-    tertiary = WarmTertiary,
-    onTertiary = OnWarmTertiary,
-    tertiaryContainer = WarmTertiaryContainer,
-    onTertiaryContainer = OnWarmTertiaryContainer,
-    background = WarmBackground,
-    onBackground = OnWarmSurface,
-    surface = WarmSurface,
-    onSurface = OnWarmSurface,
-    surfaceContainer = WarmSurfaceContainer,
-    outline = WarmOutline
+    primary = CareCoral,
+    onPrimary = OnCareCoral,
+    primaryContainer = CareCoralContainer,
+    onPrimaryContainer = OnCareCoralContainer,
+    secondary = CalmSage,
+    onSecondary = OnCalmSage,
+    secondaryContainer = CalmSageContainer,
+    onSecondaryContainer = OnCalmSageContainer,
+    tertiary = WarmGold,
+    onTertiary = OnWarmGold,
+    tertiaryContainer = WarmGoldContainer,
+    onTertiaryContainer = OnWarmGoldContainer,
+    background = CareBackground,
+    onBackground = CareOnSurface,
+    surface = CareSurface,
+    onSurface = CareOnSurface,
+    surfaceContainer = CareSurfaceContainer,
+    outline = CareOutline
 )
 
 private val DarkColors = darkColorScheme(
-    primary = DarkTealPrimary,
-    onPrimary = DarkOnTealPrimary,
-    primaryContainer = DarkTealContainer,
-    onPrimaryContainer = DarkOnTealContainer,
-    secondary = DarkSecondary,
-    onSecondary = DarkOnSecondary,
-    secondaryContainer = DarkSecondaryContainer,
-    onSecondaryContainer = DarkOnSecondaryContainer,
-    tertiary = DarkTertiary,
-    onTertiary = DarkOnTertiary,
-    tertiaryContainer = DarkTertiaryContainer,
-    onTertiaryContainer = DarkOnTertiaryContainer,
-    background = DarkBackground,
-    onBackground = DarkOnBackground,
-    surface = DarkSurface,
-    onSurface = DarkOnBackground,
-    surfaceContainer = DarkSurfaceContainer,
-    outline = DarkOutline
+    primary = DarkCareCoral,
+    onPrimary = DarkOnCareCoral,
+    primaryContainer = DarkCareCoralContainer,
+    onPrimaryContainer = DarkOnCareCoralContainer,
+    secondary = DarkCalmSage,
+    onSecondary = DarkOnCalmSage,
+    secondaryContainer = DarkCalmSageContainer,
+    onSecondaryContainer = DarkOnCalmSageContainer,
+    tertiary = DarkWarmGold,
+    onTertiary = DarkOnWarmGold,
+    tertiaryContainer = DarkWarmGoldContainer,
+    onTertiaryContainer = DarkOnWarmGoldContainer,
+    background = DarkCareBackground,
+    onBackground = DarkCareOnSurface,
+    surface = DarkCareSurface,
+    onSurface = DarkCareOnSurface,
+    surfaceContainer = DarkCareSurfaceContainer,
+    outline = DarkCareOutline
 )
 
 @Composable
 fun RiskCalcTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val context = LocalContext.current
