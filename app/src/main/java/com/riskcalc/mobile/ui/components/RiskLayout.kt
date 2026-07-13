@@ -50,8 +50,8 @@ fun ResponsiveContent(
     ) {
         Box(
             modifier = Modifier
-                .fillMaxWidth()
                 .widthIn(max = 720.dp)
+                .fillMaxWidth()
                 .padding(horizontal = 20.dp),
             content = content
         )

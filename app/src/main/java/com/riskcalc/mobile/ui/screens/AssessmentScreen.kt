@@ -13,6 +13,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LinearProgressIndicator
@@ -54,6 +55,7 @@ fun AssessmentScreen(
     modifier: Modifier = Modifier
 ) {
     var helpStep by remember { mutableStateOf<AssessmentStep?>(null) }
+    var showSevereBpAlert by remember { mutableStateOf(false) }
     RiskBackground(modifier = modifier) {
         ResponsiveContent(modifier = Modifier.fillMaxSize()) {
             Column(
@@ -111,7 +113,20 @@ fun AssessmentScreen(
                         Text(stringResource(R.string.back))
                     }
                     Button(
-                        onClick = onContinue,
+                        onClick = {
+                            val systolic = state.systolicInput
+                                .replace(',', '.')
+                                .toDoubleOrNull()
+                            if (
+                                state.currentStep == AssessmentStep.Cholesterol &&
+                                systolic != null &&
+                                systolic > 180.0
+                            ) {
+                                showSevereBpAlert = true
+                            } else {
+                                onContinue()
+                            }
+                        },
                         modifier = Modifier.weight(1.4f)
                     ) {
                         Text(
@@ -163,6 +178,29 @@ fun AssessmentScreen(
                 }
             }
         }
+    }
+
+    if (showSevereBpAlert) {
+        AlertDialog(
+            onDismissRequest = { showSevereBpAlert = false },
+            title = { Text(stringResource(R.string.severe_bp_title)) },
+            text = { Text(stringResource(R.string.severe_bp_body)) },
+            dismissButton = {
+                TextButton(onClick = { showSevereBpAlert = false }) {
+                    Text(stringResource(R.string.review_data))
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showSevereBpAlert = false
+                        onContinue()
+                    }
+                ) {
+                    Text(stringResource(R.string.understand_continue))
+                }
+            }
+        )
     }
 }
 

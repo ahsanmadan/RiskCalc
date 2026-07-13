@@ -13,7 +13,7 @@
     <string name="back">Kembali</string>
     <string name="next">Lanjut</string>
     <string name="see_result">Lihat hasil</string>
-    <string name="step_progress">Langkah %1$d/4</string>
+    <string name="step_progress">Langkah %1$d dari 4</string>
     <string name="age_question">Berapa usia Anda?</string>
     <string name="age_helper">Masukkan usia dalam tahun. Model mendukung usia 32&#8211;70 tahun.</string>
     <string name="age_label">Usia</string>
@@ -44,6 +44,8 @@
     <string name="borderline_body">Perubahan kecil pada input dapat mengubah klasifikasi. Gunakan hasil ini sebagai bahan edukasi, bukan kepastian medis.</string>
     <string name="severe_bp_title">Tekanan sistolik perlu perhatian segera</string>
     <string name="severe_bp_body">Ukur ulang setelah satu menit. Jika tetap di atas 180 mmHg, hubungi tenaga medis. Bila disertai nyeri dada, sesak napas, lemah, gangguan penglihatan, atau sulit bicara, cari bantuan darurat setempat.</string>
+    <string name="review_data">Periksa kembali</string>
+    <string name="understand_continue">Saya mengerti, lanjutkan</string>
     <string name="factor_section">Ringkasan faktor Anda</string>
     <string name="tips_section">Langkah yang dapat dipertimbangkan</string>
     <string name="edit_data">Ubah data</string>

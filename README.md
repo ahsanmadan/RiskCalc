@@ -9,7 +9,7 @@ RiskCalc adalah aplikasi Android offline untuk simulasi skrining faktor risiko j
 - Alur pembuka, stepper empat pertanyaan, dan halaman hasil.
 - Validasi input sesuai rentang dataset pelatihan.
 - Inferensi Perceptron langsung di perangkat tanpa server atau internet.
-- Ringkasan kategori faktor, tips umum, disclaimer, dan peringatan sistolik di atas 180 mmHg.
+- Ringkasan kategori faktor, tips umum, disclaimer, dan konfirmasi keselamatan sebelum hasil untuk sistolik di atas 180 mmHg.
 - Dynamic color Android 12+, fallback tema teal, light/dark mode, serta layout ponsel dan tablet dasar.
 - Tidak ada login, histori, cloud sync, confidence numerik, atau penyimpanan data kesehatan.
 

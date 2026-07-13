@@ -20,6 +20,7 @@ flowchart TD
 - `rememberNavBackStack` mempertahankan back stack saat configuration change.
 - `RiskViewModel` menyimpan input primitif melalui `SavedStateHandle` dan mengekspos satu `StateFlow<RiskUiState>`.
 - Hasil kompleks tidak dikirim sebagai navigation argument. Hasil dihitung dari state sesi dan repository lokal.
+- Sistolik di atas 180 mmHg memicu dialog keselamatan sebelum kalkulasi dilanjutkan; peringatan diulang pada hasil.
 - `Periksa Lagi` menghapus input sesi. Tidak ada data yang disimpan ke disk aplikasi.
 
 ## Model Offline
