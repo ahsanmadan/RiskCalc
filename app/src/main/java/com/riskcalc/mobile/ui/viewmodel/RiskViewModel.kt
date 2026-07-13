@@ -1,134 +1,198 @@
 package com.riskcalc.mobile.ui.viewmodel
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import android.content.Context
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.createSavedStateHandle
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import com.riskcalc.mobile.data.local.LocalRiskEngine
 import com.riskcalc.mobile.data.repository.RiskRepository
-import kotlinx.coroutines.launch
-import java.io.IOException
+import com.riskcalc.mobile.domain.model.RiskInput
+import com.riskcalc.mobile.domain.model.RiskResult
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+
+enum class AssessmentStep {
+    Age,
+    Smoking,
+    Systolic,
+    Cholesterol;
+
+    val number: Int get() = ordinal + 1
+}
+
+data class RiskUiState(
+    val currentStep: AssessmentStep = AssessmentStep.Age,
+    val ageInput: String = "",
+    val smokingInput: Boolean? = null,
+    val systolicInput: String = "",
+    val cholesterolInput: String = "",
+    val errorMessage: String? = null,
+    val result: RiskResult? = null,
+    val modelError: String? = null
+)
 
 class RiskViewModel(
-    private val repository: RiskRepository = RiskRepository()
+    private val savedStateHandle: SavedStateHandle,
+    repositoryResult: Result<RiskRepository>
 ) : ViewModel() {
+    private val repository = repositoryResult.getOrNull()
+    private val initialState = RiskUiState(
+        currentStep = AssessmentStep.entries[
+            savedStateHandle[KEY_STEP] ?: AssessmentStep.Age.ordinal
+        ],
+        ageInput = savedStateHandle[KEY_AGE] ?: "",
+        smokingInput = savedStateHandle[KEY_SMOKING],
+        systolicInput = savedStateHandle[KEY_SYSTOLIC] ?: "",
+        cholesterolInput = savedStateHandle[KEY_CHOLESTEROL] ?: "",
+        modelError = repositoryResult.exceptionOrNull()?.let {
+            "Model lokal belum dapat dimuat. Silakan pasang ulang aplikasi."
+        }
+    )
+    private val _uiState = MutableStateFlow(initialState)
+    val uiState: StateFlow<RiskUiState> = _uiState.asStateFlow()
 
-    // State untuk Input Form
-    var age by mutableStateOf("")
-        private set
+    init {
+        calculateIfComplete()
+    }
 
-    var systolicBp by mutableStateOf("")
-        private set
+    fun updateAge(value: String) = updateInput(KEY_AGE, value) { copy(ageInput = value) }
 
-    var totalCholesterol by mutableStateOf("")
-        private set
+    fun updateSmoking(value: Boolean) {
+        savedStateHandle[KEY_SMOKING] = value
+        _uiState.update { it.copy(smokingInput = value, errorMessage = null, result = null) }
+    }
 
-    var isSmoker by mutableStateOf(false)
-        private set
+    fun updateSystolic(value: String) = updateInput(KEY_SYSTOLIC, value) {
+        copy(systolicInput = value)
+    }
 
-    // State untuk Status API
-    var isLoading by mutableStateOf(false)
-        private set
+    fun updateCholesterol(value: String) = updateInput(KEY_CHOLESTEROL, value) {
+        copy(cholesterolInput = value)
+    }
 
-    var resultText by mutableStateOf("Hasil prediksi akan tampil di sini.")
-        private set
+    fun continueStep(): Boolean {
+        val error = validationError(_uiState.value.currentStep)
+        if (error != null) {
+            _uiState.update { it.copy(errorMessage = error) }
+            return false
+        }
+        val current = _uiState.value.currentStep
+        if (current == AssessmentStep.Cholesterol) {
+            return calculate()
+        }
+        setStep(AssessmentStep.entries[current.ordinal + 1])
+        return false
+    }
 
-    var predictionClass by mutableStateOf<Int?>(null)
-        private set
+    fun previousStep(): Boolean {
+        val current = _uiState.value.currentStep
+        if (current == AssessmentStep.Age) return false
+        setStep(AssessmentStep.entries[current.ordinal - 1])
+        return true
+    }
 
-    var confidence by mutableStateOf<Double?>(null)
-        private set
+    fun editData() {
+        setStep(AssessmentStep.Age)
+    }
 
-    var explanation by mutableStateOf<String?>(null)
-        private set
+    fun startNewAssessment() {
+        savedStateHandle.remove<String>(KEY_AGE)
+        savedStateHandle.remove<Boolean>(KEY_SMOKING)
+        savedStateHandle.remove<String>(KEY_SYSTOLIC)
+        savedStateHandle.remove<String>(KEY_CHOLESTEROL)
+        savedStateHandle[KEY_STEP] = AssessmentStep.Age.ordinal
+        _uiState.value = RiskUiState(modelError = _uiState.value.modelError)
+    }
 
-    var recommendations by mutableStateOf<List<String>>(emptyList())
-        private set
+    private fun calculate(): Boolean {
+        val input = parsedInput() ?: return false
+        val localRepository = repository ?: return false
+        val result = localRepository.calculate(input)
+        _uiState.update { it.copy(result = result, errorMessage = null) }
+        return true
+    }
 
-    // Setter functions untuk Form Input
-    fun onAgeChange(value: String) {
-        // Hanya izinkan angka
-        if (value.isEmpty() || value.all { it.isDigit() }) {
-            age = value
+    private fun calculateIfComplete() {
+        if (parsedInput() != null && repository != null) {
+            calculate()
         }
     }
 
-    fun onSystolicBpChange(value: String) {
-        if (value.isEmpty() || value.all { it.isDigit() }) {
-            systolicBp = value
-        }
+    private fun parsedInput(): RiskInput? {
+        val state = _uiState.value
+        return RiskInput(
+            age = state.ageInput.toIntOrNull() ?: return null,
+            systolicBp = state.systolicInput.normalizeDecimal().toDoubleOrNull() ?: return null,
+            totalCholesterol = state.cholesterolInput.toIntOrNull() ?: return null,
+            isCurrentSmoker = state.smokingInput ?: return null
+        )
     }
 
-    fun onTotalCholesterolChange(value: String) {
-        // Izinkan angka desimal titik tunggal
-        if (value.isEmpty() || value.count { it == '.' } <= 1 && value.all { it.isDigit() || it == '.' }) {
-            totalCholesterol = value
-        }
-    }
-
-    fun onSmokerChange(value: Boolean) {
-        isSmoker = value
-    }
-
-    // Fungsi utama memanggil API FastAPI
-    fun predictRisk() {
-        // 1. Validasi Input
-        val ageVal = age.toIntOrNull()
-        val bpVal = systolicBp.toIntOrNull()
-        val cholVal = totalCholesterol.toDoubleOrNull()
-        
-        if (ageVal == null || bpVal == null || cholVal == null) {
-            resultText = "Harap isi semua kolom input dengan angka yang valid!"
-            predictionClass = null
-            confidence = null
-            explanation = null
-            recommendations = emptyList()
-            return
-        }
-
-        // 2. Set loading state
-        isLoading = true
-        resultText = "Sedang menghubungi server..."
-        predictionClass = null
-        confidence = null
-        explanation = null
-        recommendations = emptyList()
-
-        // 3. Jalankan Coroutine di latar belakang
-        viewModelScope.launch {
-            try {
-                val smokingStatus = if (isSmoker) 1 else 0
-                val response = repository.getPrediction(
-                    age = ageVal,
-                    systolicBp = bpVal,
-                    totalCholesterol = cholVal,
-                    smokingStatus = smokingStatus
-                )
-                
-                // 4. Sukses: Update state dengan hasil prediksi
-                predictionClass = response.prediction
-                confidence = response.confidence
-                explanation = response.explanation
-                recommendations = response.recommendations
-                resultText = "Pasien diklasifikasikan dengan ${response.label} (Tingkat keyakinan: ${(response.confidence * 100).toInt()}%)"
-            } catch (e: IOException) {
-                // Error koneksi internet/server mati
-                resultText = "Koneksi ke API gagal. Pastikan server FastAPI sudah berjalan dan jalankan perintah 'adb reverse tcp:8000 tcp:8000' lewat kabel USB."
-                predictionClass = null
-                confidence = null
-                explanation = null
-                recommendations = emptyList()
-            } catch (e: Exception) {
-                // Error lainnya (HTTP error, parsing error)
-                resultText = "Terjadi kesalahan sistem: ${e.localizedMessage ?: "Unknown Error"}"
-                predictionClass = null
-                confidence = null
-                explanation = null
-                recommendations = emptyList()
-            } finally {
-                isLoading = false
+    private fun validationError(step: AssessmentStep): String? {
+        val state = _uiState.value
+        return when (step) {
+            AssessmentStep.Age -> when (state.ageInput.toIntOrNull()) {
+                null -> "Masukkan usia dalam angka."
+                !in AGE_RANGE -> "Model hanya mendukung usia 32-70 tahun."
+                else -> null
+            }
+            AssessmentStep.Smoking -> if (state.smokingInput == null) {
+                "Pilih Ya atau Tidak untuk melanjutkan."
+            } else null
+            AssessmentStep.Systolic -> when (
+                val value = state.systolicInput.normalizeDecimal().toDoubleOrNull()
+            ) {
+                null -> "Masukkan tekanan sistolik dalam angka."
+                else -> if (value !in SYSTOLIC_RANGE) {
+                    "Model hanya mendukung sistolik 90-220 mmHg."
+                } else null
+            }
+            AssessmentStep.Cholesterol -> when (state.cholesterolInput.toIntOrNull()) {
+                null -> "Masukkan kolesterol total dalam angka bulat."
+                !in CHOLESTEROL_RANGE -> "Model hanya mendukung kolesterol 124-398 mg/dL."
+                else -> null
             }
         }
     }
 
+    private fun setStep(step: AssessmentStep) {
+        savedStateHandle[KEY_STEP] = step.ordinal
+        _uiState.update { it.copy(currentStep = step, errorMessage = null) }
+    }
+
+    private fun updateInput(
+        key: String,
+        value: String,
+        transform: RiskUiState.() -> RiskUiState
+    ) {
+        savedStateHandle[key] = value
+        _uiState.update { it.transform().copy(errorMessage = null, result = null) }
+    }
+
+    companion object {
+        val AGE_RANGE = 32..70
+        val SYSTOLIC_RANGE = 90.0..220.0
+        val CHOLESTEROL_RANGE = 124..398
+        private const val KEY_STEP = "assessment_step"
+        private const val KEY_AGE = "age_input"
+        private const val KEY_SMOKING = "smoking_input"
+        private const val KEY_SYSTOLIC = "systolic_input"
+        private const val KEY_CHOLESTEROL = "cholesterol_input"
+
+        fun factory(context: Context): ViewModelProvider.Factory = viewModelFactory {
+            initializer {
+                val repository = runCatching {
+                    RiskRepository(LocalRiskEngine.fromAssets(context.assets))
+                }
+                RiskViewModel(createSavedStateHandle(), repository)
+            }
+        }
+    }
 }
+
+private fun String.normalizeDecimal(): String = replace(',', '.')

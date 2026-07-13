@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "modelVersion": "1.0.0",
+  "datasetSha256": "99ff9e7c23ebbaecee90b9d7f3e6745609d01f1c8e0493132b89e85d73ea109f",
+  "featureOrder": [
+    "age",
+    "systolic_bp",
+    "total_cholesterol",
+    "smoking"
+  ],
+  "means": [
+    49.615252490553075,
+    132.10254208175886,
+    236.055650979045,
+    0.4854002061147372
+  ],
+  "scales": [
+    8.663706003436905,
+    21.467971567551782,
+    42.97186166230108,
+    0.4997868005644994
+  ],
+  "weights": [
+    2.3200034984734366,
+    2.672972829581151,
+    1.1163664876740536,
+    2.4630907950324925
+  ],
+  "intercept": -1.3,
+  "classLabels": {
+    "0": "Risiko Rendah",
+    "1": "Risiko Tinggi"
+  },
+  "borderlineMargin": 0.7632963213106667
+}
