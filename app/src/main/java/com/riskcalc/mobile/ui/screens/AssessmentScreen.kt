@@ -1,5 +1,13 @@
 package com.riskcalc.mobile.ui.screens
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -49,8 +57,8 @@ import androidx.compose.ui.unit.dp
 import com.riskcalc.mobile.R
 import com.riskcalc.mobile.ui.components.ResponsiveContent
 import com.riskcalc.mobile.ui.components.RiskBackground
-import com.riskcalc.mobile.ui.components.HeartCompanion
-import com.riskcalc.mobile.ui.components.HeartMood
+import com.riskcalc.mobile.ui.components.AnimatedCareCharacter
+import com.riskcalc.mobile.ui.components.CareCharacterMood
 import com.riskcalc.mobile.ui.viewmodel.AssessmentStep
 import com.riskcalc.mobile.ui.viewmodel.RiskUiState
 
@@ -68,6 +76,11 @@ fun AssessmentScreen(
 ) {
     var helpStep by remember { mutableStateOf<AssessmentStep?>(null) }
     var showSevereBpAlert by remember { mutableStateOf(false) }
+    val animatedProgress by animateFloatAsState(
+        targetValue = state.currentStep.number / 4f,
+        animationSpec = spring(dampingRatio = 0.82f, stiffness = 260f),
+        label = "assessment progress"
+    )
 
     RiskBackground(modifier = modifier) {
         ResponsiveContent(modifier = Modifier.fillMaxSize()) {
@@ -114,11 +127,28 @@ fun AssessmentScreen(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(14.dp)
                         ) {
-                            HeartCompanion(
-                                mood = HeartMood.Happy,
-                                description = stringResource(R.string.happy_heart_description),
-                                modifier = Modifier.size(62.dp)
-                            )
+                            AnimatedContent(
+                                targetState = state.currentStep,
+                                transitionSpec = { fadeIn() togetherWith fadeOut() },
+                                label = "step character"
+                            ) { step ->
+                                AnimatedCareCharacter(
+                                    mood = when (step) {
+                                        AssessmentStep.Age -> CareCharacterMood.Cheerful
+                                        AssessmentStep.Smoking -> CareCharacterMood.Thinking
+                                        AssessmentStep.Systolic -> CareCharacterMood.Reassuring
+                                        AssessmentStep.Cholesterol -> CareCharacterMood.Cheerful
+                                    },
+                                    description = stringResource(
+                                        if (step == AssessmentStep.Smoking) {
+                                            R.string.thinking_character_description
+                                        } else {
+                                            R.string.happy_character_description
+                                        }
+                                    ),
+                                    modifier = Modifier.size(76.dp)
+                                )
+                            }
                             Column(
                                 modifier = Modifier.weight(1f),
                                 verticalArrangement = Arrangement.spacedBy(3.dp)
@@ -135,7 +165,7 @@ fun AssessmentScreen(
                         }
                     }
                     LinearProgressIndicator(
-                        progress = { state.currentStep.number / 4f },
+                        progress = { animatedProgress },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 14.dp)
@@ -153,25 +183,35 @@ fun AssessmentScreen(
                         ),
                         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                     ) {
-                        Column(modifier = Modifier.padding(22.dp)) {
-                            QuestionContent(
-                                state = state,
-                                onAgeChange = onAgeChange,
-                                onSmokingChange = onSmokingChange,
-                                onSystolicChange = onSystolicChange,
-                                onCholesterolChange = onCholesterolChange,
-                                onShowHelp = { helpStep = state.currentStep }
-                            )
-                            if (state.errorMessage != null) {
-                                Text(
-                                    text = state.errorMessage,
-                                    modifier = Modifier
-                                        .padding(top = 14.dp)
-                                        .semantics { liveRegion = LiveRegionMode.Polite },
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = MaterialTheme.colorScheme.error
+                        AnimatedContent(
+                            targetState = state.currentStep,
+                            transitionSpec = {
+                                (slideInHorizontally { it / 4 } + fadeIn()) togetherWith
+                                    (slideOutHorizontally { -it / 4 } + fadeOut())
+                            },
+                            label = "assessment question"
+                        ) { step ->
+                            Column(modifier = Modifier.padding(22.dp)) {
+                                QuestionContent(
+                                    step = step,
+                                    state = state,
+                                    onAgeChange = onAgeChange,
+                                    onSmokingChange = onSmokingChange,
+                                    onSystolicChange = onSystolicChange,
+                                    onCholesterolChange = onCholesterolChange,
+                                    onShowHelp = { helpStep = step }
                                 )
+                                if (state.errorMessage != null) {
+                                    Text(
+                                        text = state.errorMessage,
+                                        modifier = Modifier
+                                            .padding(top = 14.dp)
+                                            .semantics { liveRegion = LiveRegionMode.Polite },
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = MaterialTheme.colorScheme.error
+                                    )
+                                }
                             }
                         }
                     }
@@ -281,6 +321,7 @@ private fun AssessmentActions(
 
 @Composable
 private fun QuestionContent(
+    step: AssessmentStep,
     state: RiskUiState,
     onAgeChange: (String) -> Unit,
     onSmokingChange: (Boolean) -> Unit,
@@ -288,7 +329,7 @@ private fun QuestionContent(
     onCholesterolChange: (String) -> Unit,
     onShowHelp: () -> Unit
 ) {
-    when (state.currentStep) {
+    when (step) {
         AssessmentStep.Age -> NumericQuestion(
             title = stringResource(R.string.age_question),
             helper = stringResource(R.string.age_helper),

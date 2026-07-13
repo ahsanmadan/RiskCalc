@@ -1,5 +1,9 @@
 package com.riskcalc.mobile.ui.screens
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,6 +27,11 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.stringResource
@@ -33,8 +42,9 @@ import com.riskcalc.mobile.domain.model.FactorSummary
 import com.riskcalc.mobile.domain.model.FactorTone
 import com.riskcalc.mobile.domain.model.RiskResult
 import com.riskcalc.mobile.ui.components.DisclaimerCard
-import com.riskcalc.mobile.ui.components.HeartCompanion
-import com.riskcalc.mobile.ui.components.HeartMood
+import com.riskcalc.mobile.ui.components.AnimatedCareCharacter
+import com.riskcalc.mobile.ui.components.AnimatedEcgGraphic
+import com.riskcalc.mobile.ui.components.CareCharacterMood
 import com.riskcalc.mobile.ui.components.ResponsiveContent
 import com.riskcalc.mobile.ui.components.RiskBackground
 
@@ -46,6 +56,9 @@ fun ResultScreen(
     onNewAssessment: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var heroVisible by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { heroVisible = true }
+
     RiskBackground(modifier = modifier) {
         ResponsiveContent(modifier = Modifier.fillMaxSize()) {
             Column(
@@ -81,7 +94,15 @@ fun ResultScreen(
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                ResultHero(result = result)
+                AnimatedVisibility(
+                    visible = heroVisible,
+                    enter = fadeIn(tween(450)) + scaleIn(
+                        animationSpec = tween(500),
+                        initialScale = 0.94f
+                    )
+                ) {
+                    ResultHero(result = result)
+                }
                 if (result.severeBloodPressureWarning) {
                     SafetyAlert()
                 }
@@ -229,10 +250,14 @@ private fun ResultHero(result: RiskResult) {
             modifier = Modifier.padding(22.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            HeartCompanion(
-                mood = if (isHigh) HeartMood.Calm else HeartMood.Happy,
-                description = stringResource(R.string.calm_heart_description),
-                modifier = Modifier.size(132.dp)
+            AnimatedCareCharacter(
+                mood = if (isHigh) {
+                    CareCharacterMood.Reassuring
+                } else {
+                    CareCharacterMood.Cheerful
+                },
+                description = stringResource(R.string.reassuring_character_description),
+                modifier = Modifier.size(164.dp)
             )
             Text(
                 text = stringResource(R.string.result_context),
@@ -250,6 +275,13 @@ private fun ResultHero(result: RiskResult) {
                 ),
                 modifier = Modifier.padding(top = 10.dp),
                 style = MaterialTheme.typography.bodyLarge
+            )
+            AnimatedEcgGraphic(
+                description = stringResource(R.string.ecg_description),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 14.dp)
+                    .heightIn(min = 42.dp)
             )
         }
     }
