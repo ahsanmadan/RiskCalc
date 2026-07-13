@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,12 +19,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -41,7 +44,6 @@ import androidx.compose.ui.unit.dp
 import com.riskcalc.mobile.R
 import com.riskcalc.mobile.ui.components.AnimatedEcgGraphic
 import com.riskcalc.mobile.ui.components.CareCharacterMood
-import com.riskcalc.mobile.ui.components.DisclaimerCard
 import com.riskcalc.mobile.ui.components.GeneratedRiskyCharacter
 import com.riskcalc.mobile.ui.components.ResponsiveContent
 import com.riskcalc.mobile.ui.components.RiskBackground
@@ -70,124 +72,127 @@ fun IntroScreen(
                     visible = visible,
                     enter = fadeIn(tween(500)) + slideInVertically(tween(600)) { it / 8 }
                 ) {
-                    Surface(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(34.dp),
-                        color = MaterialTheme.colorScheme.inverseSurface,
-                        contentColor = MaterialTheme.colorScheme.inverseOnSurface
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        Column {
-                            Column(
-                                modifier = Modifier.padding(horizontal = 22.dp, vertical = 24.dp),
-                                verticalArrangement = Arrangement.spacedBy(14.dp)
-                            ) {
-                                Text(
-                                    text = stringResource(R.string.app_name),
-                                    style = MaterialTheme.typography.titleLarge,
-                                    color = MaterialTheme.colorScheme.primary
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(
+                                    color = MaterialTheme.colorScheme.inverseSurface,
+                                    shape = RoundedCornerShape(
+                                        bottomStart = 34.dp,
+                                        bottomEnd = 34.dp
+                                    )
                                 )
-                                Text(
-                                    text = stringResource(R.string.intro_prompt),
-                                    style = MaterialTheme.typography.displaySmall
-                                )
-                                FlowRow(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                                ) {
-                                    IntroTag(stringResource(R.string.tag_know))
-                                    IntroTag(stringResource(R.string.tag_understand))
-                                    IntroTag(stringResource(R.string.tag_care))
-                                }
-                            }
-
-                            Surface(
+                                .padding(horizontal = 22.dp, vertical = 22.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.app_name),
+                                style = MaterialTheme.typography.titleLarge,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                            Text(
+                                text = stringResource(R.string.intro_prompt),
+                                style = MaterialTheme.typography.displaySmall,
+                                color = MaterialTheme.colorScheme.inverseOnSurface
+                            )
+                            FlowRow(
                                 modifier = Modifier.fillMaxWidth(),
-                                color = MaterialTheme.colorScheme.tertiaryContainer,
-                                contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                                shape = RoundedCornerShape(topStart = 34.dp, topEnd = 34.dp)
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                Column(
-                                    modifier = Modifier.padding(horizontal = 22.dp, vertical = 22.dp),
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.spacedBy(10.dp)
-                                ) {
-                                    Text(
-                                        text = stringResource(R.string.care_eyebrow),
-                                        modifier = Modifier.fillMaxWidth(),
-                                        style = MaterialTheme.typography.labelLarge,
-                                        color = MaterialTheme.colorScheme.tertiary
-                                    )
-                                    Box(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        GeneratedRiskyCharacter(
-                                            mood = CareCharacterMood.Cheerful,
-                                            description = stringResource(R.string.happy_character_description),
-                                            modifier = Modifier.size(190.dp)
-                                        )
-                                    }
-                                    Text(
-                                        text = stringResource(R.string.intro_body),
-                                        modifier = Modifier.fillMaxWidth(),
-                                        style = MaterialTheme.typography.bodyLarge
-                                    )
-                                    AnimatedEcgGraphic(
-                                        description = stringResource(R.string.ecg_description),
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(38.dp)
-                                    )
-                                    Button(
-                                        onClick = onStart,
-                                        enabled = modelError == null,
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .heightIn(min = 58.dp),
-                                        shape = RoundedCornerShape(18.dp),
-                                        colors = ButtonDefaults.buttonColors(
-                                            containerColor = MaterialTheme.colorScheme.inverseSurface,
-                                            contentColor = MaterialTheme.colorScheme.inverseOnSurface
-                                        )
-                                    ) {
-                                        Text(
-                                            text = stringResource(R.string.start_assessment),
-                                            modifier = Modifier.padding(vertical = 4.dp)
-                                        )
-                                    }
-                                    Text(
-                                        text = stringResource(R.string.assessment_duration),
-                                        style = MaterialTheme.typography.labelLarge
-                                    )
-                                }
+                                IntroTag(stringResource(R.string.tag_know))
+                                IntroTag(stringResource(R.string.tag_understand))
+                                IntroTag(stringResource(R.string.tag_care))
                             }
                         }
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(14.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(150.dp)
+                                    .background(
+                                        MaterialTheme.colorScheme.tertiaryContainer,
+                                        CircleShape
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                GeneratedRiskyCharacter(
+                                    mood = CareCharacterMood.Cheerful,
+                                    description = stringResource(R.string.happy_character_description),
+                                    modifier = Modifier.size(162.dp)
+                                )
+                            }
+                            Column(
+                                modifier = Modifier.weight(1f),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.care_eyebrow),
+                                    style = MaterialTheme.typography.labelLarge,
+                                    color = MaterialTheme.colorScheme.tertiary
+                                )
+                                Text(
+                                    text = stringResource(R.string.intro_body),
+                                    style = MaterialTheme.typography.bodyLarge
+                                )
+                            }
+                        }
+
+                        AnimatedEcgGraphic(
+                            description = stringResource(R.string.ecg_description),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(30.dp)
+                        )
+                        Button(
+                            onClick = onStart,
+                            enabled = modelError == null,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .heightIn(min = 58.dp),
+                            shape = RoundedCornerShape(18.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.inverseSurface,
+                                contentColor = MaterialTheme.colorScheme.inverseOnSurface
+                            )
+                        ) {
+                            Text(
+                                text = stringResource(R.string.start_assessment),
+                                modifier = Modifier.padding(vertical = 4.dp)
+                            )
+                        }
+                        Text(
+                            text = stringResource(R.string.assessment_duration),
+                            modifier = Modifier.fillMaxWidth(),
+                            style = MaterialTheme.typography.labelLarge
+                        )
                     }
                 }
 
-                DisclaimerCard(text = stringResource(R.string.disclaimer))
+                InlineDisclaimer(text = stringResource(R.string.disclaimer))
 
-                Card(
+                Column(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(26.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainer
-                    )
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Column(
-                        modifier = Modifier.padding(20.dp),
-                        verticalArrangement = Arrangement.spacedBy(14.dp)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.intro_data_title),
-                            style = MaterialTheme.typography.titleLarge
-                        )
-                        CareDataRow("01", stringResource(R.string.age_label))
-                        CareDataRow("02", stringResource(R.string.smoking_label_short))
-                        CareDataRow("03", stringResource(R.string.systolic_label))
-                        CareDataRow("04", stringResource(R.string.cholesterol_label))
-                    }
+                    Text(
+                        text = stringResource(R.string.intro_data_title),
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                    CareDataRow("01", stringResource(R.string.age_label))
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                    CareDataRow("02", stringResource(R.string.smoking_label_short))
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                    CareDataRow("03", stringResource(R.string.systolic_label))
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                    CareDataRow("04", stringResource(R.string.cholesterol_label))
                 }
 
                 if (modelError != null) {
@@ -216,6 +221,30 @@ fun IntroScreen(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun InlineDisclaimer(text: String, modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(width = 4.dp, height = 64.dp)
+                .background(
+                    color = MaterialTheme.colorScheme.error,
+                    shape = RoundedCornerShape(100.dp)
+                )
+        )
+        Text(
+            text = text,
+            modifier = Modifier.weight(1f),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }
 
