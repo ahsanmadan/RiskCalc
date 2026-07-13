@@ -5,13 +5,17 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
@@ -44,32 +48,47 @@ fun ResultScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
-                    .padding(top = 20.dp, bottom = 32.dp),
-                verticalArrangement = Arrangement.spacedBy(14.dp)
+                    .statusBarsPadding()
+                    .navigationBarsPadding()
+                    .padding(top = 10.dp, bottom = 28.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                TextButton(onClick = onBack) {
-                    Text(stringResource(R.string.back))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    TextButton(onClick = onBack) {
+                        Text(stringResource(R.string.back))
+                    }
+                    Text(
+                        text = stringResource(R.string.app_name),
+                        modifier = Modifier.padding(top = 14.dp),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
                 }
                 Text(
                     text = stringResource(R.string.result_title),
-                    style = MaterialTheme.typography.headlineMedium
+                    style = MaterialTheme.typography.headlineLarge,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
+                ResultHero(result = result)
                 if (result.severeBloodPressureWarning) {
                     SafetyAlert()
                 }
-                ResultHero(result = result)
                 if (result.prediction.isBorderline) {
                     Card(
                         modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(20.dp),
                         colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onTertiaryContainer
                         )
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Text(
                                 text = stringResource(R.string.borderline_title),
-                                style = MaterialTheme.typography.titleLarge
+                                style = MaterialTheme.typography.titleMedium
                             )
                             Text(
                                 text = stringResource(R.string.borderline_body),
@@ -79,65 +98,86 @@ fun ResultScreen(
                         }
                     }
                 }
-                Text(
-                    text = stringResource(R.string.factor_section),
-                    modifier = Modifier.padding(top = 10.dp),
-                    style = MaterialTheme.typography.titleLarge
-                )
-                result.factors.forEach { factor -> FactorCard(factor) }
-                Text(
-                    text = stringResource(R.string.tips_section),
-                    modifier = Modifier.padding(top = 10.dp),
-                    style = MaterialTheme.typography.titleLarge
-                )
+
+                SectionTitle(stringResource(R.string.factor_section))
                 Card(
                     modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(24.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer
+                    )
+                ) {
+                    Column {
+                        result.factors.forEachIndexed { index, factor ->
+                            FactorItem(factor)
+                            if (index < result.factors.lastIndex) {
+                                HorizontalDivider(
+                                    modifier = Modifier.padding(horizontal = 18.dp),
+                                    color = MaterialTheme.colorScheme.outlineVariant
+                                )
+                            }
+                        }
+                    }
+                }
+
+                SectionTitle(stringResource(R.string.tips_section))
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(24.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer
                     )
                 ) {
                     Column(
                         modifier = Modifier.padding(18.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                        verticalArrangement = Arrangement.spacedBy(14.dp)
                     ) {
                         result.tips.forEachIndexed { index, tip ->
-                            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                                 Surface(
                                     shape = RoundedCornerShape(100.dp),
-                                    color = MaterialTheme.colorScheme.primary,
-                                    contentColor = MaterialTheme.colorScheme.onPrimary
+                                    color = MaterialTheme.colorScheme.primaryContainer,
+                                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
                                 ) {
                                     Text(
                                         text = "${index + 1}",
-                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+                                        modifier = Modifier.padding(horizontal = 9.dp, vertical = 4.dp),
                                         style = MaterialTheme.typography.labelLarge
                                     )
                                 }
                                 Text(
                                     text = tip,
                                     modifier = Modifier.weight(1f),
-                                    style = MaterialTheme.typography.bodyLarge
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
                             }
                         }
                     }
                 }
+
                 DisclaimerCard(text = stringResource(R.string.disclaimer))
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 8.dp),
+                        .padding(top = 4.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     OutlinedButton(
                         onClick = onEdit,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(54.dp),
+                        shape = RoundedCornerShape(17.dp)
                     ) {
                         Text(stringResource(R.string.edit_data))
                     }
                     Button(
                         onClick = onNewAssessment,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(54.dp),
+                        shape = RoundedCornerShape(17.dp)
                     ) {
                         Text(stringResource(R.string.new_assessment))
                     }
@@ -148,20 +188,31 @@ fun ResultScreen(
 }
 
 @Composable
+private fun SectionTitle(text: String) {
+    Text(
+        text = text,
+        modifier = Modifier.padding(top = 6.dp),
+        style = MaterialTheme.typography.titleLarge,
+        color = MaterialTheme.colorScheme.onSurface
+    )
+}
+
+@Composable
 private fun ResultHero(result: RiskResult) {
     val isHigh = result.prediction.classId == 1
     Card(
         modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(28.dp),
         colors = CardDefaults.cardColors(
             containerColor = if (isHigh) {
-                MaterialTheme.colorScheme.errorContainer
+                MaterialTheme.colorScheme.secondaryContainer
             } else {
-                MaterialTheme.colorScheme.tertiaryContainer
+                MaterialTheme.colorScheme.primaryContainer
             },
             contentColor = if (isHigh) {
-                MaterialTheme.colorScheme.onErrorContainer
+                MaterialTheme.colorScheme.onSecondaryContainer
             } else {
-                MaterialTheme.colorScheme.onTertiaryContainer
+                MaterialTheme.colorScheme.onPrimaryContainer
             }
         )
     ) {
@@ -190,9 +241,10 @@ private fun ResultHero(result: RiskResult) {
 private fun SafetyAlert() {
     Card(
         modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(22.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.error,
-            contentColor = MaterialTheme.colorScheme.onError
+            containerColor = MaterialTheme.colorScheme.errorContainer,
+            contentColor = MaterialTheme.colorScheme.onErrorContainer
         )
     ) {
         Column(modifier = Modifier.padding(18.dp)) {
@@ -204,42 +256,37 @@ private fun SafetyAlert() {
             Text(
                 text = stringResource(R.string.severe_bp_body),
                 modifier = Modifier.padding(top = 8.dp),
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.bodyMedium
             )
         }
     }
 }
 
 @Composable
-private fun FactorCard(factor: FactorSummary) {
-    val container = when (factor.tone) {
-        FactorTone.Neutral -> MaterialTheme.colorScheme.surfaceContainerHigh
-        FactorTone.Positive -> MaterialTheme.colorScheme.tertiaryContainer
-        FactorTone.Attention -> MaterialTheme.colorScheme.secondaryContainer
-        FactorTone.Urgent -> MaterialTheme.colorScheme.errorContainer
-    }
-    val content = when (factor.tone) {
+private fun FactorItem(factor: FactorSummary) {
+    val valueColor = when (factor.tone) {
         FactorTone.Neutral -> MaterialTheme.colorScheme.onSurface
-        FactorTone.Positive -> MaterialTheme.colorScheme.onTertiaryContainer
-        FactorTone.Attention -> MaterialTheme.colorScheme.onSecondaryContainer
-        FactorTone.Urgent -> MaterialTheme.colorScheme.onErrorContainer
+        FactorTone.Positive -> MaterialTheme.colorScheme.primary
+        FactorTone.Attention -> MaterialTheme.colorScheme.tertiary
+        FactorTone.Urgent -> MaterialTheme.colorScheme.error
     }
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = container, contentColor = content)
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = factor.title, style = MaterialTheme.typography.labelLarge)
-            Text(
-                text = factor.value,
-                modifier = Modifier.padding(top = 3.dp),
-                style = MaterialTheme.typography.titleLarge
-            )
-            Text(
-                text = factor.description,
-                modifier = Modifier.padding(top = 6.dp),
-                style = MaterialTheme.typography.bodyMedium
-            )
-        }
+    Column(modifier = Modifier.padding(18.dp)) {
+        Text(
+            text = factor.title,
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Text(
+            text = factor.value,
+            modifier = Modifier.padding(top = 4.dp),
+            style = MaterialTheme.typography.titleLarge,
+            color = valueColor
+        )
+        Text(
+            text = factor.description,
+            modifier = Modifier.padding(top = 6.dp),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }

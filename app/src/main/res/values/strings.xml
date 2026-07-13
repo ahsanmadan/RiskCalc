@@ -7,6 +7,7 @@
     <string name="intro_body">RiskCalc membantu melihat pola faktor risiko dari usia, kebiasaan merokok, tekanan darah sistolik, dan kolesterol total.</string>
     <string name="intro_data_title">Siapkan data berikut</string>
     <string name="intro_data_list">Usia  |  Status merokok  |  Sistolik  |  Kolesterol</string>
+    <string name="smoking_label_short">Status merokok</string>
     <string name="disclaimer">Hasil ini hanya simulasi skrining awal untuk pembelajaran, bukan diagnosis medis atau pengganti pemeriksaan tenaga kesehatan.</string>
     <string name="start_assessment">Mulai periksa</string>
     <string name="offline_private">Berjalan offline. Data tidak disimpan.</string>

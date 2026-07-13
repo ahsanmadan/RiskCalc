@@ -3,27 +3,31 @@ package com.riskcalc.mobile.ui.screens
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -33,6 +37,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -56,64 +63,16 @@ fun AssessmentScreen(
 ) {
     var helpStep by remember { mutableStateOf<AssessmentStep?>(null) }
     var showSevereBpAlert by remember { mutableStateOf(false) }
+
     RiskBackground(modifier = modifier) {
         ResponsiveContent(modifier = Modifier.fillMaxSize()) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .imePadding()
-                    .padding(top = 20.dp, bottom = 24.dp)
-            ) {
-                TextButton(onClick = onBack) {
-                    Text(stringResource(R.string.back))
-                }
-                Text(
-                    text = stringResource(R.string.step_progress, state.currentStep.number),
-                    modifier = Modifier.padding(top = 18.dp),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                LinearProgressIndicator(
-                    progress = { state.currentStep.number / 4f },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 10.dp)
-                        .height(8.dp),
-                    trackColor = MaterialTheme.colorScheme.surfaceContainerHighest
-                )
-                Spacer(modifier = Modifier.height(36.dp))
-                QuestionContent(
-                    state = state,
-                    onAgeChange = onAgeChange,
-                    onSmokingChange = onSmokingChange,
-                    onSystolicChange = onSystolicChange,
-                    onCholesterolChange = onCholesterolChange,
-                    onShowHelp = { helpStep = state.currentStep }
-                )
-                if (state.errorMessage != null) {
-                    Text(
-                        text = state.errorMessage,
-                        modifier = Modifier.padding(top = 14.dp),
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
-                Spacer(modifier = Modifier.height(36.dp))
-                HorizontalDivider(modifier = Modifier.padding(top = 36.dp, bottom = 18.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    OutlinedButton(
-                        onClick = onBack,
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text(stringResource(R.string.back))
-                    }
-                    Button(
-                        onClick = {
+            Scaffold(
+                containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0f),
+                contentColor = MaterialTheme.colorScheme.onSurface,
+                bottomBar = {
+                    AssessmentActions(
+                        onBack = onBack,
+                        onContinue = {
                             val systolic = state.systolicInput
                                 .replace(',', '.')
                                 .toDoubleOrNull()
@@ -127,17 +86,72 @@ fun AssessmentScreen(
                                 onContinue()
                             }
                         },
-                        modifier = Modifier.weight(1.4f)
+                        isLastStep = state.currentStep == AssessmentStep.Cholesterol
+                    )
+                }
+            ) { innerPadding ->
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                        .verticalScroll(rememberScrollState())
+                        .imePadding()
+                        .padding(top = 20.dp, bottom = 28.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            stringResource(
-                                if (state.currentStep == AssessmentStep.Cholesterol) {
-                                    R.string.see_result
-                                } else {
-                                    R.string.next
-                                }
-                            )
+                            text = stringResource(R.string.app_name),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.primary
                         )
+                        Text(
+                            text = stringResource(R.string.step_progress, state.currentStep.number),
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    LinearProgressIndicator(
+                        progress = { state.currentStep.number / 4f },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 12.dp)
+                            .height(6.dp),
+                        trackColor = MaterialTheme.colorScheme.surfaceContainerHighest
+                    )
+
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 30.dp),
+                        shape = RoundedCornerShape(26.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+                        )
+                    ) {
+                        Column(modifier = Modifier.padding(22.dp)) {
+                            QuestionContent(
+                                state = state,
+                                onAgeChange = onAgeChange,
+                                onSmokingChange = onSmokingChange,
+                                onSystolicChange = onSystolicChange,
+                                onCholesterolChange = onCholesterolChange,
+                                onShowHelp = { helpStep = state.currentStep }
+                            )
+                            if (state.errorMessage != null) {
+                                Text(
+                                    text = state.errorMessage,
+                                    modifier = Modifier
+                                        .padding(top = 14.dp)
+                                        .semantics { liveRegion = LiveRegionMode.Polite },
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -191,7 +205,7 @@ fun AssessmentScreen(
                 }
             },
             confirmButton = {
-                Button(
+                TextButton(
                     onClick = {
                         showSevereBpAlert = false
                         onContinue()
@@ -201,6 +215,45 @@ fun AssessmentScreen(
                 }
             }
         )
+    }
+}
+
+@Composable
+private fun AssessmentActions(
+    onBack: () -> Unit,
+    onContinue: () -> Unit,
+    isLastStep: Boolean
+) {
+    Surface(
+        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.96f),
+        tonalElevation = 3.dp
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .navigationBarsPadding()
+                .padding(horizontal = 4.dp, vertical = 14.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            OutlinedButton(
+                onClick = onBack,
+                modifier = Modifier
+                    .weight(1f)
+                    .height(54.dp),
+                shape = RoundedCornerShape(17.dp)
+            ) {
+                Text(stringResource(R.string.back))
+            }
+            Button(
+                onClick = onContinue,
+                modifier = Modifier
+                    .weight(1.45f)
+                    .height(54.dp),
+                shape = RoundedCornerShape(17.dp)
+            ) {
+                Text(stringResource(if (isLastStep) R.string.see_result else R.string.next))
+            }
+        }
     }
 }
 
@@ -227,7 +280,8 @@ private fun QuestionContent(
         AssessmentStep.Smoking -> {
             Text(
                 text = stringResource(R.string.smoking_question),
-                style = MaterialTheme.typography.headlineMedium
+                style = MaterialTheme.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.onSurface
             )
             Text(
                 text = stringResource(R.string.smoking_helper),
@@ -238,7 +292,7 @@ private fun QuestionContent(
             SingleChoiceSegmentedButtonRow(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 28.dp)
+                    .padding(top = 24.dp)
             ) {
                 listOf(false, true).forEachIndexed { index, value ->
                     SegmentedButton(
@@ -293,7 +347,11 @@ private fun NumericQuestion(
     isError: Boolean,
     onShowHelp: (() -> Unit)? = null
 ) {
-    Text(text = title, style = MaterialTheme.typography.headlineMedium)
+    Text(
+        text = title,
+        style = MaterialTheme.typography.headlineMedium,
+        color = MaterialTheme.colorScheme.onSurface
+    )
     Text(
         text = helper,
         modifier = Modifier.padding(top = 10.dp),
@@ -305,16 +363,17 @@ private fun NumericQuestion(
         onValueChange = onValueChange,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 26.dp),
+            .padding(top = 24.dp),
         label = { Text(label) },
         suffix = { Text(suffix) },
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
         singleLine = true,
         isError = isError,
+        shape = RoundedCornerShape(16.dp),
         textStyle = MaterialTheme.typography.titleLarge
     )
     if (onShowHelp != null) {
-        TextButton(onClick = onShowHelp, modifier = Modifier.padding(top = 6.dp)) {
+        TextButton(onClick = onShowHelp, modifier = Modifier.padding(top = 4.dp)) {
             Text(stringResource(R.string.how_to_know))
         }
     }

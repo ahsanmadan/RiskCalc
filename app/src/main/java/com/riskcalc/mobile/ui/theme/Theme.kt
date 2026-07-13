@@ -23,15 +23,33 @@ private val LightColors = lightColorScheme(
     onTertiary = OnWarmTertiary,
     tertiaryContainer = WarmTertiaryContainer,
     onTertiaryContainer = OnWarmTertiaryContainer,
+    background = WarmBackground,
+    onBackground = OnWarmSurface,
     surface = WarmSurface,
-    onSurface = OnWarmSurface
+    onSurface = OnWarmSurface,
+    surfaceContainer = WarmSurfaceContainer,
+    outline = WarmOutline
 )
 
 private val DarkColors = darkColorScheme(
     primary = DarkTealPrimary,
     onPrimary = DarkOnTealPrimary,
     primaryContainer = DarkTealContainer,
-    onPrimaryContainer = DarkOnTealContainer
+    onPrimaryContainer = DarkOnTealContainer,
+    secondary = DarkSecondary,
+    onSecondary = DarkOnSecondary,
+    secondaryContainer = DarkSecondaryContainer,
+    onSecondaryContainer = DarkOnSecondaryContainer,
+    tertiary = DarkTertiary,
+    onTertiary = DarkOnTertiary,
+    tertiaryContainer = DarkTertiaryContainer,
+    onTertiaryContainer = DarkOnTertiaryContainer,
+    background = DarkBackground,
+    onBackground = DarkOnBackground,
+    surface = DarkSurface,
+    onSurface = DarkOnBackground,
+    surfaceContainer = DarkSurfaceContainer,
+    outline = DarkOutline
 )
 
 @Composable

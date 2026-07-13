@@ -2,16 +2,16 @@ package com.riskcalc.mobile.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -39,73 +39,87 @@ fun IntroScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
-                    .padding(top = 40.dp, bottom = 28.dp),
-                verticalArrangement = Arrangement.Center
+                    .statusBarsPadding()
+                    .padding(top = 24.dp, bottom = 28.dp),
+                verticalArrangement = Arrangement.spacedBy(18.dp)
             ) {
-                Surface(
-                    color = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary,
-                    shape = RoundedCornerShape(100.dp)
-                ) {
-                    Text(
-                        text = stringResource(R.string.educational_label),
-                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 7.dp),
-                        style = MaterialTheme.typography.labelLarge
-                    )
-                }
-                Spacer(modifier = Modifier.height(20.dp))
-                Text(
-                    text = stringResource(R.string.app_name),
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Text(
-                    text = stringResource(R.string.app_tagline),
-                    modifier = Modifier.padding(top = 2.dp),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Text(
-                    text = stringResource(R.string.intro_title),
-                    modifier = Modifier.padding(top = 8.dp),
-                    style = MaterialTheme.typography.displaySmall
-                )
-                Text(
-                    text = stringResource(R.string.intro_body),
-                    modifier = Modifier.padding(top = 14.dp),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 24.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
-                    )
-                ) {
-                    Column(modifier = Modifier.padding(18.dp)) {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Surface(
+                        color = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        shape = RoundedCornerShape(100.dp)
+                    ) {
                         Text(
-                            text = stringResource(R.string.intro_data_title),
-                            style = MaterialTheme.typography.titleLarge
+                            text = stringResource(R.string.educational_label),
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp),
+                            style = MaterialTheme.typography.labelLarge
+                        )
+                    }
+                    Column {
+                        Text(
+                            text = stringResource(R.string.app_name),
+                            style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.primary
                         )
                         Text(
-                            text = stringResource(R.string.intro_data_list),
-                            modifier = Modifier.padding(top = 10.dp),
-                            style = MaterialTheme.typography.bodyLarge,
+                            text = stringResource(R.string.app_tagline),
+                            style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
-                DisclaimerCard(
-                    text = stringResource(R.string.disclaimer),
-                    modifier = Modifier.padding(top = 14.dp)
-                )
+
+                Column(modifier = Modifier.padding(top = 10.dp)) {
+                    Text(
+                        text = stringResource(R.string.intro_title),
+                        style = MaterialTheme.typography.headlineLarge,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = stringResource(R.string.intro_body),
+                        modifier = Modifier.padding(top = 12.dp),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(24.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier.padding(18.dp),
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.intro_data_title),
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            DataPill(stringResource(R.string.age_label), Modifier.weight(1f))
+                            DataPill(stringResource(R.string.smoking_label_short), Modifier.weight(1f))
+                        }
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            DataPill(stringResource(R.string.systolic_label), Modifier.weight(1f))
+                            DataPill(stringResource(R.string.cholesterol_label), Modifier.weight(1f))
+                        }
+                    }
+                }
+
+                DisclaimerCard(text = stringResource(R.string.disclaimer))
+
                 if (modelError != null) {
                     Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 14.dp),
+                        modifier = Modifier.fillMaxWidth(),
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.errorContainer,
                             contentColor = MaterialTheme.colorScheme.onErrorContainer
@@ -120,28 +134,41 @@ fun IntroScreen(
                         }
                     }
                 }
+
                 Button(
                     onClick = onStart,
                     enabled = modelError == null,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 22.dp)
-                        .height(56.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary
-                    )
+                        .height(58.dp),
+                    shape = RoundedCornerShape(18.dp)
                 ) {
                     Text(stringResource(R.string.start_assessment))
                 }
                 Text(
                     text = stringResource(R.string.offline_private),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 12.dp),
+                    modifier = Modifier.fillMaxWidth(),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun DataPill(text: String, modifier: Modifier = Modifier) {
+    Surface(
+        modifier = modifier,
+        color = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.onSurface,
+        shape = RoundedCornerShape(14.dp)
+    ) {
+        Text(
+            text = text,
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.SemiBold
+        )
     }
 }
