@@ -16,6 +16,8 @@ import com.riskcalc.mobile.ui.navigation.ResultRoute
 import com.riskcalc.mobile.ui.screens.AssessmentScreen
 import com.riskcalc.mobile.ui.screens.IntroScreen
 import com.riskcalc.mobile.ui.screens.ResultScreen
+import com.riskcalc.mobile.ui.viewmodel.RiskEvent
+import com.riskcalc.mobile.ui.viewmodel.RiskViewAction
 import com.riskcalc.mobile.ui.viewmodel.RiskViewModel
 
 @Composable
@@ -25,6 +27,16 @@ fun RiskCalcApp(modifier: Modifier = Modifier) {
     val viewModel: RiskViewModel = viewModel(factory = factory)
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val backStack = rememberNavBackStack(IntroRoute)
+
+    fun handleAction(action: RiskViewAction) {
+        when (action) {
+            RiskViewAction.None -> Unit
+            RiskViewAction.OpenAssessment -> backStack.add(AssessmentRoute)
+            RiskViewAction.OpenResult -> backStack.add(ResultRoute)
+            RiskViewAction.CloseAssessment -> backStack.removeLastOrNull()
+            RiskViewAction.BackToAssessment -> backStack.removeLastOrNull()
+        }
+    }
 
     NavDisplay(
         backStack = backStack,
@@ -36,27 +48,30 @@ fun RiskCalcApp(modifier: Modifier = Modifier) {
                     IntroScreen(
                         modelError = state.modelError,
                         onStart = {
-                            viewModel.startNewAssessment()
-                            backStack.add(AssessmentRoute)
+                            handleAction(viewModel.onEvent(RiskEvent.StartAssessment))
                         }
                     )
                 }
                 AssessmentRoute -> NavEntry(route) {
                     AssessmentScreen(
                         state = state,
-                        onAgeChange = viewModel::updateAge,
-                        onSmokingChange = viewModel::updateSmoking,
-                        onSystolicChange = viewModel::updateSystolic,
-                        onCholesterolChange = viewModel::updateCholesterol,
+                        onAgeChange = { value ->
+                            viewModel.onEvent(RiskEvent.AgeChanged(value))
+                        },
+                        onSmokingChange = { value ->
+                            viewModel.onEvent(RiskEvent.SmokingChanged(value))
+                        },
+                        onSystolicChange = { value ->
+                            viewModel.onEvent(RiskEvent.SystolicChanged(value))
+                        },
+                        onCholesterolChange = { value ->
+                            viewModel.onEvent(RiskEvent.CholesterolChanged(value))
+                        },
                         onBack = {
-                            if (!viewModel.previousStep()) {
-                                backStack.removeLastOrNull()
-                            }
+                            handleAction(viewModel.onEvent(RiskEvent.GoBack))
                         },
                         onContinue = {
-                            if (viewModel.continueStep()) {
-                                backStack.add(ResultRoute)
-                            }
+                            handleAction(viewModel.onEvent(RiskEvent.ContinueAssessment))
                         }
                     )
                 }
@@ -67,12 +82,10 @@ fun RiskCalcApp(modifier: Modifier = Modifier) {
                         },
                         onBack = { backStack.removeLastOrNull() },
                         onEdit = {
-                            viewModel.editData()
-                            backStack.removeLastOrNull()
+                            handleAction(viewModel.onEvent(RiskEvent.EditData))
                         },
                         onNewAssessment = {
-                            viewModel.startNewAssessment()
-                            backStack.removeLastOrNull()
+                            handleAction(viewModel.onEvent(RiskEvent.StartNewAssessment))
                         }
                     )
                 }

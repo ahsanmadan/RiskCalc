@@ -1,6 +1,7 @@
 package com.riskcalc.mobile.ui.viewmodel
 
 import android.content.Context
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -25,6 +26,27 @@ enum class AssessmentStep {
     val number: Int get() = ordinal + 1
 }
 
+sealed interface RiskEvent {
+    data object StartAssessment : RiskEvent
+    data class AgeChanged(val value: String) : RiskEvent
+    data class SmokingChanged(val value: Boolean) : RiskEvent
+    data class SystolicChanged(val value: String) : RiskEvent
+    data class CholesterolChanged(val value: String) : RiskEvent
+    data object ContinueAssessment : RiskEvent
+    data object GoBack : RiskEvent
+    data object EditData : RiskEvent
+    data object StartNewAssessment : RiskEvent
+}
+
+sealed interface RiskViewAction {
+    data object None : RiskViewAction
+    data object OpenAssessment : RiskViewAction
+    data object OpenResult : RiskViewAction
+    data object CloseAssessment : RiskViewAction
+    data object BackToAssessment : RiskViewAction
+}
+
+@Immutable
 data class RiskUiState(
     val currentStep: AssessmentStep = AssessmentStep.Age,
     val ageInput: String = "",
@@ -34,7 +56,10 @@ data class RiskUiState(
     val errorMessage: String? = null,
     val result: RiskResult? = null,
     val modelError: String? = null
-)
+) {
+    val isFirstStep: Boolean get() = currentStep == AssessmentStep.Age
+    val isLastStep: Boolean get() = currentStep == AssessmentStep.Cholesterol
+}
 
 class RiskViewModel(
     private val savedStateHandle: SavedStateHandle,
@@ -60,53 +85,70 @@ class RiskViewModel(
         calculateIfComplete()
     }
 
-    fun updateAge(value: String) = updateInput(KEY_AGE, value) { copy(ageInput = value) }
-
-    fun updateSmoking(value: Boolean) {
-        savedStateHandle[KEY_SMOKING] = value
-        _uiState.update { it.copy(smokingInput = value, errorMessage = null, result = null) }
+    fun onEvent(event: RiskEvent): RiskViewAction {
+        return when (event) {
+            RiskEvent.StartAssessment -> {
+                resetForNewAssessment()
+                RiskViewAction.OpenAssessment
+            }
+            is RiskEvent.AgeChanged -> {
+                updateInput(KEY_AGE, event.value) { copy(ageInput = event.value) }
+                RiskViewAction.None
+            }
+            is RiskEvent.SmokingChanged -> {
+                savedStateHandle[KEY_SMOKING] = event.value
+                _uiState.update {
+                    it.copy(
+                        smokingInput = event.value,
+                        errorMessage = null,
+                        result = null
+                    )
+                }
+                RiskViewAction.None
+            }
+            is RiskEvent.SystolicChanged -> {
+                updateInput(KEY_SYSTOLIC, event.value) { copy(systolicInput = event.value) }
+                RiskViewAction.None
+            }
+            is RiskEvent.CholesterolChanged -> {
+                updateInput(KEY_CHOLESTEROL, event.value) { copy(cholesterolInput = event.value) }
+                RiskViewAction.None
+            }
+            RiskEvent.ContinueAssessment -> continueAssessment()
+            RiskEvent.GoBack -> goBack()
+            RiskEvent.EditData -> {
+                setStep(AssessmentStep.Age)
+                RiskViewAction.BackToAssessment
+            }
+            RiskEvent.StartNewAssessment -> {
+                resetForNewAssessment()
+                RiskViewAction.CloseAssessment
+            }
+        }
     }
 
-    fun updateSystolic(value: String) = updateInput(KEY_SYSTOLIC, value) {
-        copy(systolicInput = value)
-    }
-
-    fun updateCholesterol(value: String) = updateInput(KEY_CHOLESTEROL, value) {
-        copy(cholesterolInput = value)
-    }
-
-    fun continueStep(): Boolean {
+    private fun continueAssessment(): RiskViewAction {
         val error = validationError(_uiState.value.currentStep)
         if (error != null) {
             _uiState.update { it.copy(errorMessage = error) }
-            return false
+            return RiskViewAction.None
         }
+
         val current = _uiState.value.currentStep
         if (current == AssessmentStep.Cholesterol) {
-            return calculate()
+            return if (calculate()) RiskViewAction.OpenResult else RiskViewAction.None
         }
+
         setStep(AssessmentStep.entries[current.ordinal + 1])
-        return false
+        return RiskViewAction.None
     }
 
-    fun previousStep(): Boolean {
+    private fun goBack(): RiskViewAction {
         val current = _uiState.value.currentStep
-        if (current == AssessmentStep.Age) return false
+        if (current == AssessmentStep.Age) return RiskViewAction.CloseAssessment
+
         setStep(AssessmentStep.entries[current.ordinal - 1])
-        return true
-    }
-
-    fun editData() {
-        setStep(AssessmentStep.Age)
-    }
-
-    fun startNewAssessment() {
-        savedStateHandle.remove<String>(KEY_AGE)
-        savedStateHandle.remove<Boolean>(KEY_SMOKING)
-        savedStateHandle.remove<String>(KEY_SYSTOLIC)
-        savedStateHandle.remove<String>(KEY_CHOLESTEROL)
-        savedStateHandle[KEY_STEP] = AssessmentStep.Age.ordinal
-        _uiState.value = RiskUiState(modelError = _uiState.value.modelError)
+        return RiskViewAction.None
     }
 
     private fun calculate(): Boolean {
@@ -143,14 +185,18 @@ class RiskViewModel(
             }
             AssessmentStep.Smoking -> if (state.smokingInput == null) {
                 "Pilih Ya atau Tidak untuk melanjutkan."
-            } else null
+            } else {
+                null
+            }
             AssessmentStep.Systolic -> when (
                 val value = state.systolicInput.normalizeDecimal().toDoubleOrNull()
             ) {
                 null -> "Masukkan tekanan sistolik dalam angka."
                 else -> if (value !in SYSTOLIC_RANGE) {
                     "Model hanya mendukung sistolik 90-220 mmHg."
-                } else null
+                } else {
+                    null
+                }
             }
             AssessmentStep.Cholesterol -> when (state.cholesterolInput.toIntOrNull()) {
                 null -> "Masukkan kolesterol total dalam angka bulat."
@@ -163,6 +209,15 @@ class RiskViewModel(
     private fun setStep(step: AssessmentStep) {
         savedStateHandle[KEY_STEP] = step.ordinal
         _uiState.update { it.copy(currentStep = step, errorMessage = null) }
+    }
+
+    private fun resetForNewAssessment() {
+        savedStateHandle.remove<String>(KEY_AGE)
+        savedStateHandle.remove<Boolean>(KEY_SMOKING)
+        savedStateHandle.remove<String>(KEY_SYSTOLIC)
+        savedStateHandle.remove<String>(KEY_CHOLESTEROL)
+        savedStateHandle[KEY_STEP] = AssessmentStep.Age.ordinal
+        _uiState.value = RiskUiState(modelError = _uiState.value.modelError)
     }
 
     private fun updateInput(

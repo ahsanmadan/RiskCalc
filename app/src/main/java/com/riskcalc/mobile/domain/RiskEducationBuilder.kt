@@ -12,7 +12,7 @@ object RiskEducationBuilder {
             FactorSummary(
                 title = "Usia",
                 value = "${input.age} tahun",
-                description = "Usia digunakan model sebagai faktor yang tidak dapat diubah.",
+                description = "Usia termasuk faktor yang tidak dapat diubah.",
                 tone = FactorTone.Neutral
             ),
             smokingFactor(input.isCurrentSmoker),
@@ -32,14 +32,14 @@ object RiskEducationBuilder {
         FactorSummary(
             title = "Status merokok",
             value = "Merokok aktif",
-            description = "Merokok merupakan faktor risiko yang dapat diubah.",
+            description = "Merokok termasuk faktor risiko yang dapat diubah.",
             tone = FactorTone.Attention
         )
     } else {
         FactorSummary(
             title = "Status merokok",
             value = "Tidak merokok",
-            description = "Pertahankan kebiasaan tidak merokok dan hindari asap rokok.",
+            description = "Pertahankan kebiasaan ini dan hindari asap rokok.",
             tone = FactorTone.Positive
         )
     }
@@ -48,27 +48,27 @@ object RiskEducationBuilder {
         val (value, description, tone) = when {
             systolicBp > 180 -> Triple(
                 "Sistolik sangat tinggi",
-                "Ukur ulang setelah satu menit. Cari bantuan segera bila ada gejala serius.",
+                "Ukur ulang setelah satu menit. Cari bantuan medis bila ada gejala serius.",
                 FactorTone.Urgent
             )
             systolicBp >= 140 -> Triple(
                 "Sistolik tinggi tahap 2",
-                "Kategori edukatif berdasarkan angka sistolik saja.",
+                "Perlu perhatian lebih berdasarkan angka sistolik.",
                 FactorTone.Attention
             )
             systolicBp >= 130 -> Triple(
                 "Sistolik tinggi tahap 1",
-                "Kategori edukatif berdasarkan angka sistolik saja.",
+                "Perlu dipantau berdasarkan angka sistolik.",
                 FactorTone.Attention
             )
             systolicBp >= 120 -> Triple(
                 "Sistolik meningkat",
-                "Pantau pengukuran dan pertahankan kebiasaan sehat.",
+                "Pantau hasil pengukuran dan jaga kebiasaan sehat.",
                 FactorTone.Attention
             )
             else -> Triple(
                 "Sistolik dalam rentang normal",
-                "Kategori edukatif berdasarkan angka sistolik saja.",
+                "Masih dalam rentang normal berdasarkan angka sistolik.",
                 FactorTone.Positive
             )
         }
@@ -84,17 +84,17 @@ object RiskEducationBuilder {
         val (value, description, tone) = when {
             totalCholesterol >= 240 -> Triple(
                 "Tinggi",
-                "Kolesterol total berada pada kategori tinggi.",
+                "Perlu perhatian karena masuk kategori tinggi.",
                 FactorTone.Attention
             )
             totalCholesterol >= 200 -> Triple(
                 "Batas tinggi",
-                "Kolesterol total berada pada kategori borderline high.",
+                "Sudah mendekati kategori tinggi.",
                 FactorTone.Attention
             )
             else -> Triple(
                 "Optimal",
-                "Kolesterol total berada di bawah 200 mg/dL.",
+                "Masih di bawah 200 mg/dL.",
                 FactorTone.Positive
             )
         }
@@ -109,20 +109,20 @@ object RiskEducationBuilder {
     private fun buildTips(input: RiskInput, prediction: RiskPrediction): List<String> {
         val tips = mutableListOf<String>()
         if (prediction.classId == 1) {
-            tips += "Pertimbangkan berkonsultasi dengan tenaga medis untuk penilaian yang lebih lengkap."
+            tips += "Jadwalkan konsultasi medis untuk evaluasi lebih lanjut."
         } else {
-            tips += "Hasil lebih rendah bukan berarti tanpa risiko; tetap lakukan pemeriksaan kesehatan berkala."
+            tips += "Tetap lakukan pemeriksaan kesehatan secara berkala."
         }
         if (input.isCurrentSmoker) {
-            tips += "Cari dukungan tenaga medis atau layanan berhenti merokok untuk membantu menghentikan kebiasaan merokok."
+            tips += "Kurangi dan hentikan kebiasaan merokok dengan bantuan tenaga medis bila perlu."
         }
         if (input.systolicBp >= 120.0) {
-            tips += "Ukur tekanan darah secara benar dan diskusikan hasil yang berulang dengan tenaga medis."
+            tips += "Ukur tekanan darah secara rutin dan catat hasilnya."
         }
         if (input.totalCholesterol >= 200) {
-            tips += "Diskusikan pemeriksaan profil lipid lengkap dan pola makan dengan tenaga medis."
+            tips += "Periksa profil lipid lengkap dan atur pola makan harian."
         }
-        tips += "Pertahankan pola makan seimbang, aktivitas fisik teratur, tidur cukup, dan kelola stres."
+        tips += "Jaga pola makan, aktif bergerak, tidur cukup, dan kelola stres."
         return tips.distinct().take(5)
     }
 

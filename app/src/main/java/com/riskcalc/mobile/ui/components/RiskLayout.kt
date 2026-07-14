@@ -37,7 +37,6 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -191,41 +190,6 @@ fun AnimatedCareCharacter(
     description: String,
     modifier: Modifier = Modifier
 ) {
-    val animation = rememberInfiniteTransition(label = "care character")
-    val floatOffset by animation.animateFloat(
-        initialValue = 3f,
-        targetValue = -7f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(1700, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "character float"
-    )
-    val breathScale by animation.animateFloat(
-        initialValue = 0.98f,
-        targetValue = 1.02f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(1400, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "character breath"
-    )
-    val blink by animation.animateFloat(
-        initialValue = 1f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = keyframes {
-                durationMillis = 3400
-                1f at 0
-                1f at 2400
-                0.08f at 2480
-                1f at 2570
-                1f at 3400
-            }
-        ),
-        label = "character blink"
-    )
-    val density = LocalDensity.current
     val bodyColor = when (mood) {
         CareCharacterMood.Cheerful -> MaterialTheme.colorScheme.primary
         CareCharacterMood.Thinking -> MaterialTheme.colorScheme.secondary
@@ -238,13 +202,7 @@ fun AnimatedCareCharacter(
     val cheekColor = MaterialTheme.colorScheme.tertiaryContainer
 
     Canvas(
-        modifier = modifier
-            .graphicsLayer {
-                translationY = with(density) { floatOffset.dp.toPx() }
-                scaleX = breathScale
-                scaleY = breathScale
-            }
-            .semantics { contentDescription = description }
+        modifier = modifier.semantics { contentDescription = description }
     ) {
         val width = size.width
         val height = size.height
@@ -274,7 +232,7 @@ fun AnimatedCareCharacter(
             cap = StrokeCap.Round
         )
 
-        val eyeHeight = height * 0.055f * blink
+        val eyeHeight = height * 0.055f
         drawOval(
             color = faceColor,
             topLeft = Offset(width * 0.35f, height * 0.40f - eyeHeight / 2),
@@ -322,48 +280,14 @@ fun GeneratedRiskyCharacter(
     description: String,
     modifier: Modifier = Modifier
 ) {
-    val animation = rememberInfiniteTransition(label = "generated Risky character")
-    val floatOffset by animation.animateFloat(
-        initialValue = 3f,
-        targetValue = -7f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(1700, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "Risky float"
-    )
-    val breathScale by animation.animateFloat(
-        initialValue = 0.985f,
-        targetValue = 1.018f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(1450, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "Risky breath"
-    )
-    val sparkleAlpha by animation.animateFloat(
-        initialValue = 0.18f,
-        targetValue = 0.90f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(900, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "Risky sparkle"
-    )
-    val density = LocalDensity.current
     val artwork = when (mood) {
         CareCharacterMood.Cheerful -> R.drawable.risky_cheerful
         CareCharacterMood.Thinking -> R.drawable.risky_thinking
         CareCharacterMood.Reassuring -> R.drawable.risky_reassuring
     }
-    val sparkleColor = MaterialTheme.colorScheme.tertiary
 
     Box(
-        modifier = modifier.graphicsLayer {
-            translationY = with(density) { floatOffset.dp.toPx() }
-            scaleX = breathScale
-            scaleY = breathScale
-        },
+        modifier = modifier,
         contentAlignment = Alignment.Center
     ) {
         Image(
@@ -372,23 +296,6 @@ fun GeneratedRiskyCharacter(
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Fit
         )
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            drawCircle(
-                color = sparkleColor.copy(alpha = sparkleAlpha),
-                radius = size.minDimension * 0.018f,
-                center = Offset(size.width * 0.13f, size.height * 0.24f)
-            )
-            drawCircle(
-                color = sparkleColor.copy(alpha = sparkleAlpha * 0.72f),
-                radius = size.minDimension * 0.012f,
-                center = Offset(size.width * 0.88f, size.height * 0.34f)
-            )
-            drawCircle(
-                color = sparkleColor.copy(alpha = sparkleAlpha * 0.55f),
-                radius = size.minDimension * 0.008f,
-                center = Offset(size.width * 0.82f, size.height * 0.17f)
-            )
-        }
     }
 }
 
