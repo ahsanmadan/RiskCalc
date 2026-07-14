@@ -17,6 +17,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -469,7 +470,11 @@ private fun AssessmentActions(
                 modifier = Modifier
                     .weight(1f)
                     .heightIn(min = 54.dp),
-                shape = RoundedCornerShape(17.dp)
+                shape = RoundedCornerShape(17.dp),
+                border = BorderStroke(
+                    width = 1.dp,
+                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.72f)
+                )
             ) {
                 Text(stringResource(R.string.back))
             }
@@ -571,6 +576,14 @@ private fun QuestionContent(
             onValueChange = onSystolicChange,
             keyboardType = KeyboardType.Decimal,
             isError = state.errorMessage != null,
+            focusedTextColor = AssessmentFieldText,
+            unfocusedTextColor = AssessmentFieldText,
+            focusedLabelColor = AssessmentStepAccentStart,
+            unfocusedLabelColor = AssessmentFieldLabel,
+            focusedBorderColor = AssessmentStepAccentStart,
+            unfocusedBorderColor = AssessmentFieldOutline,
+            focusedContainerColor = AssessmentFieldContainer,
+            unfocusedContainerColor = AssessmentFieldContainer,
             onShowHelp = onShowHelp
         )
         AssessmentStep.Cholesterol -> NumericQuestion(
@@ -582,6 +595,14 @@ private fun QuestionContent(
             onValueChange = onCholesterolChange,
             keyboardType = KeyboardType.Number,
             isError = state.errorMessage != null,
+            focusedTextColor = AssessmentFieldText,
+            unfocusedTextColor = AssessmentFieldText,
+            focusedLabelColor = AssessmentStepAccentStart,
+            unfocusedLabelColor = AssessmentFieldLabel,
+            focusedBorderColor = AssessmentStepAccentStart,
+            unfocusedBorderColor = AssessmentFieldOutline,
+            focusedContainerColor = AssessmentFieldContainer,
+            unfocusedContainerColor = AssessmentFieldContainer,
             onShowHelp = onShowHelp
         )
     }
