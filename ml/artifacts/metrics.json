@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "datasetRows": 4159,
+  "datasetSha256": "5ec346b79f47a8eef6687d473c1cc3273b564788a285dc907171562cbc9a722e",
+  "split": {
+    "train": 2911,
+    "validation": 624,
+    "test": 624
+  },
+  "model": "Perceptron",
+  "randomState": 42,
+  "borderlinePercentile": 10,
+  "borderlineMargin": 0.7632963213106667,
+  "metrics": {
+    "train": {
+      "accuracy": 0.9938165578838887,
+      "precision": 0.9918552036199095,
+      "recall": 0.9918552036199095,
+      "f1": 0.9918552036199095,
+      "confusionMatrix": {
+        "trueNegative": 1797,
+        "falsePositive": 9,
+        "falseNegative": 9,
+        "truePositive": 1096
+      }
+    },
+    "validation": {
+      "accuracy": 0.9935897435897436,
+      "precision": 0.983402489626556,
+      "recall": 1.0,
+      "f1": 0.9916317991631799,
+      "confusionMatrix": {
+        "trueNegative": 383,
+        "falsePositive": 4,
+        "falseNegative": 0,
+        "truePositive": 237
+      }
+    },
+    "test": {
+      "accuracy": 0.9887820512820513,
+      "precision": 0.9956896551724138,
+      "recall": 0.9746835443037974,
+      "f1": 0.9850746268656716,
+      "confusionMatrix": {
+        "trueNegative": 386,
+        "falsePositive": 1,
+        "falseNegative": 6,
+        "truePositive": 231
+      }
+    }
+  },
+  "limitations": [
+    "Target risk_label dibuat dari aturan linear sintetis.",
+    "Metrik mengukur kesesuaian terhadap label sintetis, bukan validitas klinis.",
+    "Model hanya berlaku pada rentang data yang didokumentasikan aplikasi."
+  ]
+}
