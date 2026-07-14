@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -81,6 +82,10 @@ private val ResultSectionSurface = Color(0xFFF7FBF9)
 private val ResultTipSurface = Color(0xFFEEF7F4)
 private val ResultDisclaimerSurface = Color(0xFF214A47)
 private val ResultDisclaimerAccent = Color(0xFFF4D7B8)
+private val ResultBodyStrong = Color(0xFF214A47)
+private val ResultCaptionStrong = Color(0xFF36514C)
+private val ResultTipNumber = Color(0xFF1E5B4E)
+private val ResultTipNumberText = Color(0xFFF4FBF8)
 
 @Composable
 fun ResultScreen(
@@ -105,6 +110,7 @@ fun ResultScreen(
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
                     .statusBarsPadding()
+                    .imePadding()
                     .navigationBarsPadding()
                     .padding(top = 12.dp, bottom = 28.dp),
                 verticalArrangement = Arrangement.spacedBy(18.dp)
@@ -275,12 +281,13 @@ private fun ResultHero(result: RiskResult) {
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
     ) {
         Column(
-            modifier = Modifier.padding(22.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier = Modifier.padding(horizontal = 22.dp, vertical = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalAlignment = Alignment.CenterVertically
+                horizontalArrangement = Arrangement.spacedBy(18.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
             ) {
                 GeneratedRiskyCharacter(
                     mood = if (isHigh) {
@@ -289,11 +296,11 @@ private fun ResultHero(result: RiskResult) {
                         CareCharacterMood.Cheerful
                     },
                     description = stringResource(R.string.reassuring_character_description),
-                    modifier = Modifier.size(124.dp)
+                    modifier = Modifier.size(118.dp)
                 )
                 Column(
                     modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     Surface(
                         shape = RoundedCornerShape(999.dp),
@@ -313,7 +320,8 @@ private fun ResultHero(result: RiskResult) {
                             Text(
                                 text = stringResource(R.string.result_context),
                                 style = MaterialTheme.typography.labelLarge,
-                                color = heroTextColor
+                                color = heroTextColor,
+                                fontWeight = FontWeight.SemiBold
                             )
                         }
                     }
@@ -328,7 +336,7 @@ private fun ResultHero(result: RiskResult) {
                             if (isHigh) R.string.high_result_support else R.string.low_result_support
                         ),
                         style = MaterialTheme.typography.bodyLarge,
-                        color = heroTextColor.copy(alpha = 0.92f)
+                        color = heroTextColor.copy(alpha = 0.96f)
                     )
                 }
             }
@@ -337,6 +345,7 @@ private fun ResultHero(result: RiskResult) {
                 description = stringResource(R.string.ecg_description),
                 modifier = Modifier
                     .fillMaxWidth()
+                    .padding(top = 6.dp)
                     .height(42.dp)
             )
         }
@@ -459,7 +468,8 @@ private fun FactorItem(factor: FactorSummary) {
                 Text(
                     text = factor.title,
                     style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = ResultCaptionStrong,
+                    fontWeight = FontWeight.SemiBold
                 )
                 Text(
                     text = factor.value,
@@ -470,7 +480,7 @@ private fun FactorItem(factor: FactorSummary) {
                 Text(
                     text = factor.description,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = ResultBodyStrong.copy(alpha = 0.88f)
                 )
             }
         }
@@ -494,8 +504,8 @@ private fun TipItem(
         Surface(
             modifier = Modifier.size(34.dp),
             shape = RoundedCornerShape(12.dp),
-            color = MaterialTheme.colorScheme.primaryContainer,
-            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+            color = ResultTipNumber,
+            contentColor = ResultTipNumberText
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Text(
@@ -512,12 +522,13 @@ private fun TipItem(
             Text(
                 text = "Saran $index",
                 style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.primary
+                color = ResultTipNumber,
+                fontWeight = FontWeight.SemiBold
             )
             Text(
                 text = tip,
                 style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface
+                color = ResultBodyStrong
             )
         }
     }
@@ -572,7 +583,9 @@ private fun ResultFooterActions(
     onNewAssessment: () -> Unit
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .navigationBarsPadding(),
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         OutlinedButton(
